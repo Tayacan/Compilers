@@ -95,15 +95,37 @@ Exp:
   | TSLit { StrLit $1 }
   | TLCurly Exps TRCurly { ArrLit $2 }
   | LVal  { LValue $1 }
-  | 
+  /* TODO */
 ;
+
+Op:
+    /* TODO */
+;
+
+
 
 Exps:
     /* TODO */
     /* Should include the position of the first Expr */
 ;
 
+CallParams:
+    /* TODO */
+;
+
 PDecl:
+    /* TODO */
+;
+
+Params:
+    /* TODO */
+;
+
+Dec:
+    /* TODO */
+;
+
+Decs:
     /* TODO */
 ;
 
