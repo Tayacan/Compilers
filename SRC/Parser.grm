@@ -1,4 +1,4 @@
-{%
+%{
 open AbSyn;
 
 fun packLiteral f v = Literal (BVal (f (#1 v)) ,#2 v)
