@@ -4,25 +4,32 @@ open AbSyn;
 fun packLiteral f v = Literal (BVal (f (#1 v)) ,#2 v)
 %}
 
+/* keywords */
 %token <Pos> TProgram TFunction TProcedure
 %token <Pos> TVar TBegin TEnd
 %token <Pos> TIf TThen TElse
 %token <Pos> TWhile TDo TReturn
 
+/* type keywords */
 %token <Pos> TArray TOf
 %token <Pos> TInt TChar TBool
 
+/* punctuation */
 %token <Pos> TSemi TColon TComma TAssign
 
+/* operators */
 %token <Pos> TPlus TMinus TTimes TSlash
 %token <Pos> TEq TLess TAnd
 
+/* parentheses */
 %token <Pos> TLParen TRParen
 %token <Pos> TLCurly TRCurly
 %token <Pos> TLBracket TRBracket
 
+/* identifiers */
 %token <Ident * Pos> TId
 
+/* literals */
 %token <int * Pos> TNLit
 %token <bool * Pos> TBLit
 %token <char * Pos> TCLit
@@ -30,6 +37,7 @@ fun packLiteral f v = Literal (BVal (f (#1 v)) ,#2 v)
 
 %token <Pos> TEOF
 
+/* main parser */
 %start Prog
 %type <Prog> Prog
 
