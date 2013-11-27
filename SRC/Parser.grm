@@ -41,6 +41,24 @@ fun opGen op p (e1,e2) = op (e1,e2,p)
 /* main parser */
 %start Prog
 %type <Prog> Prog
+%type <Fundecs> Fundecs
+%type <Fundec> Fundec
+%type <Block> Block
+%type <DBlock> DBlock
+%type <SBlock> SBlock
+%type <StmtSeq> StmtSeq
+%type <Stmt> Stmt
+%type <LVal> LVal
+%type <Ret> Ret
+%type <Exp> Exp
+%type <Op> Op
+%type <Exps> Exps
+%type <CallParams> CallParams
+%type <PDecl> PDecl
+%type <Params> Params
+%type <Dec> Dec
+%type <Decs> Decs
+%type <Type> Type
 
 %%
 
