@@ -6,39 +6,39 @@ fun opGen op p (e1,e2) = op (e1,e2,p)
 %}
 
 /* keywords */
-%token <Pos> TProgram TFunction TProcedure
-%token <Pos> TVar TBegin TEnd
-%token <Pos> TIf TThen TElse
-%token <Pos> TWhile TDo TReturn
+%token <AbSyn.Pos> TProgram TFunction TProcedure
+%token <AbSyn.Pos> TVar TBegin TEnd
+%token <AbSyn.Pos> TIf TThen TElse
+%token <AbSyn.Pos> TWhile TDo TReturn
 
 /* type keywords */
-%token <Pos> TArray TOf
-%token <Pos> TInt TChar TBool
+%token <AbSyn.Pos> TArray TOf
+%token <AbSyn.Pos> TInt TChar TBool
 
 /* punctuation */
-%token <Pos> TSemi TColon TComma TAssign
+%token <AbSyn.Pos> TSemi TColon TComma TAssign
 
 /* operators */
-%token <Pos> TPlus TMinus TTimes TSlash
-%token <Pos> TEq TLess TAnd TOr
-%token <Pos> TNot
+%token <AbSyn.Pos> TPlus TMinus TTimes TSlash
+%token <AbSyn.Pos> TEq TLess TAnd TOr
+%token <AbSyn.Pos> TNot
 
 
 /* parentheses */
-%token <Pos> TLParen TRParen
-%token <Pos> TLCurly TRCurly
-%token <Pos> TLBracket TRBracket
+%token <AbSyn.Pos> TLParen TRParen
+%token <AbSyn.Pos> TLCurly TRCurly
+%token <AbSyn.Pos> TLBracket TRBracket
 
 /* identifiers */
-%token <Ident * Pos> TId
+%token <AbSyn.Ident * AbSyn.Pos> TId
 
 /* literals */
-%token <int * Pos> TNLit
-%token <bool * Pos> TBLit
-%token <char * Pos> TCLit
-%token <string * Pos> TSLit
+%token <int * AbSyn.Pos> TNLit
+%token <bool * AbSyn.Pos> TBLit
+%token <char * AbSyn.Pos> TCLit
+%token <string * AbSyn.Pos> TSLit
 
-%token <Pos> TEOF
+%token <AbSyn.Pos> TEOF
 
 %left or
 %left and
@@ -49,7 +49,7 @@ fun opGen op p (e1,e2) = op (e1,e2,p)
 
 /* main parser */
 %start Prog
-%type <Prog> Prog
+%type <AbSyn.Prog> Prog
 %type <Fundec list> Fundecs
 %type <Fundec> Fundec
 %type <StmtBlock> Block
