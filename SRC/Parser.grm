@@ -1,8 +1,8 @@
 %{
 open AbSyn;
 
-fun packLiteral f v = Literal (BVal (f (#1 v)) ,#2 v)
-fun opGen op p (e1,e2) = op (e1,e2,p)
+fun packLiteral f (v,p) = Literal (BVal (f v) ,p)
+fun opGen con p (e1,e2) = con (e1,e2,p)
 %}
 
 /* keywords */
