@@ -2,6 +2,7 @@
 open AbSyn;
 
 fun packLiteral f v = Literal (BVal (f (#1 v)) ,#2 v)
+fun opGen op p (e1,e2) = op (e1,e2,p)
 %}
 
 /* keywords */
@@ -97,46 +98,63 @@ Ret:
 ;
 
 Exp:
-    TNLit { packLiteral Num $1 }
-  | TBLit { packLiteral Log $1 }
-  | TCLit { packLiteral Chr $1 }
-  | TSLit { StrLit $1 }
-  | TLCurly Exps TRCurly { ArrLit $2 }
-  | LVal  { LValue $1 }
-  /* TODO */
+    TNLit                          { packLiteral Num $1 }
+  | TBLit                          { packLiteral Log $1 }
+  | TCLit                          { packLiteral Chr $1 }
+  | TSLit                          { StrLit $1 }
+  | TLCurly Exps TRCurly           { ArrLit ($2,$1) }
+  | LVal                           { LValue $1 }
+  | TNot Exp                       { Not($2,$1) }
+  | Exp Op Exp                     { $2 ($1,$3)  }
+  | TLParen Exp TRParen            { $2 }
+  | TId TLParen CallParams TRParen { FunApp(#1 $1,$3,#2 $1) }
 ;
 
 Op:
-    /* TODO */
+    TPlus  { opGen Plus $1 }
+    TMinus { opGen Minus $1 }
+    TTimes { opGen Times $1 }
+    TDiv   { opGen Div $1 }
+    TEqual { opGen Equal $1 }
+    TLess  { opGen Less $1 }
+    TAnd   { opGen And $1 }
+    TOr    { opGen Or $1 }
 ;
 
 
 
 Exps:
-    /* TODO */
-    /* Should include the position of the first Expr */
+    Exp  TComma Exps { $1 :: $2 }
+  | Exp              { [$1] }
 ;
 
 CallParams:
-    /* TODO */
+    Exps        { $1 }
+  | /* empty */ { [] }
 ;
 
 PDecl:
-    /* TODO */
+    Params      { $1 }
+  | /* empty */ { [] }
 ;
 
 Params:
-    /* TODO */
+    Dec TSemi Params { $1 :: $3 }
+  | Dec              { [$1] }
 ;
 
 Dec:
-    /* TODO */
+    TId TColon Type { Dec(#1 $1, $3, #2 $1) }
 ;
 
 Decs:
-    /* TODO */
+   Dec Decs  { $1 :: $2 }
+ | Dec TSemi { [$1] }
 ;
 
 Type:
-    /* TODO */
+   TInt { Int $1 }
+ | TBool { Bool $1 }
+ | TChar { Char $1 }
+ | TArray TOf Type { Array($3,$1) }
 ;
