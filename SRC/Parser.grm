@@ -50,8 +50,8 @@ fun opGen con p (e1,e2) = con (e1,e2,p)
 /* main parser */
 %start Prog
 %type <AbSyn.Prog> Prog
-%type <Fundec list> Fundecs
-%type <Fundec> Fundec
+%type <FunDec list> Fundecs
+%type <FunDec> Fundec
 %type <StmtBlock> Block
 %type <Dec list> DBlock
 %type <Stmt list> SBlock
