@@ -20,7 +20,9 @@ fun opGen op p (e1,e2) = op (e1,e2,p)
 
 /* operators */
 %token <Pos> TPlus TMinus TTimes TSlash
-%token <Pos> TEq TLess TAnd
+%token <Pos> TEq TLess TAnd TOr
+%token <Pos> TNot
+
 
 /* parentheses */
 %token <Pos> TLParen TRParen
@@ -41,23 +43,23 @@ fun opGen op p (e1,e2) = op (e1,e2,p)
 /* main parser */
 %start Prog
 %type <Prog> Prog
-%type <Fundecs> Fundecs
+%type <Fundec list> Fundecs
 %type <Fundec> Fundec
-%type <Block> Block
-%type <DBlock> DBlock
-%type <SBlock> SBlock
-%type <StmtSeq> StmtSeq
+%type <StmtBlock> Block
+%type <Dec list> DBlock
+%type <Stmt list> SBlock
+%type <Stmt list> StmtSeq
 %type <Stmt> Stmt
-%type <LVal> LVal
-%type <Ret> Ret
+%type <LVAL> LVal
+%type <Exp option> Ret
 %type <Exp> Exp
-%type <Op> Op
-%type <Exps> Exps
-%type <CallParams> CallParams
-%type <PDecl> PDecl
-%type <Params> Params
+%type <Exp * Exp -> Exp> Op
+%type <Exp list> Exps
+%type <Exp list> CallParams
+%type <Dec list> PDecl
+%type <Dec list> Params
 %type <Dec> Dec
-%type <Decs> Decs
+%type <Dec list> Decs
 %type <Type> Type
 
 %%
@@ -132,8 +134,8 @@ Op:
     TPlus  { opGen Plus $1 }
     TMinus { opGen Minus $1 }
     TTimes { opGen Times $1 }
-    TDiv   { opGen Div $1 }
-    TEqual { opGen Equal $1 }
+    TSlash { opGen Div $1 }
+    TEq    { opGen Equal $1 }
     TLess  { opGen Less $1 }
     TAnd   { opGen And $1 }
     TOr    { opGen Or $1 }
