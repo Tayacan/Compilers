@@ -40,6 +40,7 @@ fun opGen con p (e1,e2) = con (e1,e2,p)
 
 %token <AbSyn.Pos> TEOF
 
+%right TIf TElse TThen
 %left or
 %left and
 %right not
