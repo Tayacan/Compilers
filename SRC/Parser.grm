@@ -157,7 +157,7 @@ Op:
 
 
 Exps:
-    Exp  TComma Exps { $1 :: $2 }
+    Exp  TComma Exps { $1 :: $3 }
   | Exp              { [$1] }
 ;
 
