@@ -40,6 +40,7 @@ fun opGen con p (e1,e2) = con (e1,e2,p)
 
 %token <AbSyn.Pos> TEOF
 
+%right TId TSemi /* for the sake of Decs */
 %right TIf TElse TThen
 %left or
 %left and
@@ -180,7 +181,7 @@ Dec:
 ;
 
 Decs:
-   Dec Decs  { $1 :: $2 }
+   Dec TSemi Decs  { $1 :: $3 }
  | Dec TSemi { [$1] }
 ;
 
