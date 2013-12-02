@@ -114,7 +114,6 @@ Stmt:
   | LVal TAssign Exp                { Assign   (#1 $1, $3, #2 $1) }
 ;
 
-
 LVal:
     TId                          { (Var   (#1 $1),     #2 $1) }
   | TId TLBracket Exps TRBracket { (Index (#1 $1, $3), #2 $1) }
