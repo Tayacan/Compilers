@@ -47,10 +47,8 @@
        | "bool"         => Parser.TBool   pos
        | "char"         => Parser.TChar   pos
        | "and"          => Parser.TAnd    pos
-(* not active yet, not in Parser
        | "or"           => Parser.TOr     pos
        | "not"          => Parser.TNot    pos
-*)
        | "true"         => Parser.TBLit (true, pos)
        | "false"        => Parser.TBLit (false, pos)
 
