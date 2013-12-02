@@ -1,0 +1,9 @@
+graph {
+    ordering = out;
+    Exp0 [label="Exp"];
+    Exp1 [label="Exp"];
+    Exp2 [label="Exp"];
+    Exp0 -- Exp1;
+    Exp0 -- "+";
+    Exp0 -- Exp2;
+}
