@@ -62,7 +62,6 @@ fun opGen con p (e1,e2) = con (e1,e2,p)
 %type <LVAL * Pos> LVal
 %type <Exp option> Ret
 %type <Exp> Exp
-%type <Exp * Exp -> Exp> Op
 %type <Exp list> Exps
 %type <Exp list> CallParams
 %type <Dec list> PDecl
@@ -140,20 +139,16 @@ Exp:
   | TLCurly Exps TRCurly           { ArrLit ($2,$1) }
   | LVal                           { LValue $1 }
   | TNot Exp                       { Not($2,$1) }
-  | Exp Op Exp                     { $2 ($1,$3)  }
+  | Exp TPlus Exp                  { opGen Plus $2($1,$3) }
+  | Exp TMinus Exp                 { opGen Minus $2($1,$3) }
+  | Exp TTimes Exp                 { opGen Times $2($1,$3) }
+  | Exp TSlash Exp                 { opGen Div $2($1,$3) }
+  | Exp TEq Exp                    { opGen Equal $2($1,$3) }
+  | Exp TLess Exp                  { opGen Less $2($1,$3) }
+  | Exp TAnd Exp                   { opGen And $2($1,$3) }
+  | Exp TOr Exp                    { opGen Or $2($1,$3) }
   | TLParen Exp TRParen            { $2 }
   | TId TLParen CallParams TRParen { FunApp(#1 $1,$3,#2 $1) }
-;
-
-Op:
-    TPlus  { opGen Plus $1 }
-  | TMinus { opGen Minus $1 }
-  | TTimes { opGen Times $1 }
-  | TSlash { opGen Div $1 }
-  | TEq    { opGen Equal $1 }
-  | TLess  { opGen Less $1 }
-  | TAnd   { opGen And $1 }
-  | TOr    { opGen Or $1 }
 ;
 
 Exps:
