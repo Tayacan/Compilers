@@ -107,7 +107,6 @@ StmtSeq:
 
 Stmt:
     TId TLParen CallParams TRParen  { ProcCall (#1 $1, $3, #2 $1) }
-  /* THIS IS BAD. MAKE IT NOT AMBIGUOUS!!1! */
   | TIf Exp TThen Block             { IfThEl   ($2, $4, Block([],[]), $1) }
   | TIf Exp TThen Block TElse Block { IfThEl   ($2, $4, $6, $1) }
   | TWhile Exp TDo Block            { While    ($2, $4, $1) }
@@ -115,11 +114,6 @@ Stmt:
   | LVal TAssign Exp                { Assign   (#1 $1, $3, #2 $1) }
 ;
 
-/* TODO mess around with this */
-/*MatchedElse:
-    TIf Exp TThen MatchedElse TElse MatchedElse { IfThEl ($2, $4, $6, $1) }
-;
-*/
 
 LVal:
     TId                          { (Var   (#1 $1),     #2 $1) }

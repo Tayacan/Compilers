@@ -5,5 +5,26 @@
 
 \begin{document}
 \maketitle
-
+\newpage
+\section{Parser implementation}
+We've implemented the parser in mosmlyac using the grammar given in the GroupProject.pdf
+as a starting point. To make the grammar suitable for LR(1)-parsing we made some
+transformations of the grammar:
+\begin{enumerate}
+  \item We've made \texttt{if-then-else}-statements right-associative (simply by using
+        \texttt{\%right}) in mosmlyac. This means that an \texttt{if} will bind to the
+        closest \texttt{else}. This is the only transformation that actually change the
+        language though it was necessary as the given grammar is ambiguous.
+  \item All nonterminals of the form $X \rightarrow \alpha | X \alpha$ has been transformed
+        to $X \rightarrow \alpha | \alpha X$. This has been done as SML-lists are most
+        effectively constructed by using \texttt{::}.
+  \item In the production $Exp \rightarrow Exp \; OP \; Exp$, $OP$ has been replaced with
+        the actual operator-terminals. This was done to unhide operator precedence for
+        mosmlyac.
+        %This was done to let mosmlyac see what level of operator precedence there is
+        %during the parsing of expressions of the form 
+        %This was done to make mosmlyac generate a state for each precedence level of the
+        %operators. Otherwise, it wouldn't be able to know what kind of operator (if any)
+        %the preceding expression contained.$
+\end{enumerate}
 \end{document}
