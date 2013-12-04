@@ -28,8 +28,17 @@ transformations of the grammar:
         %the preceding expression contained.$
 \end{enumerate}
 \section{Testing}
-
+All of the Paladim-programs in \texttt{DATA}-folder has been successfully parsed, although 
+we had to correct the syntax error in the first line of \texttt{testTypeInference.pal}.
+(The keyword \texttt{program} was missing before the name of the program.)
 
 \section{Ideas for other tasks}
+\subsection{Integer multiplication and division etc.}
+We expect to implement multiplication, division and \texttt{or} similarly to the existing implementation of plus, minus and \texttt{and}, respectivly in \texttt{Compiler.sml} just byusing the corresponding MIPS-instructions.
+\subsection{Type-checking}
+
+\subsection{Indexing into arrays}
+
+
 
 \end{document}

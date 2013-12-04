@@ -28,7 +28,7 @@ struct
       BType of BasicType
     | Array of int * BasicType
 
-  type  Ident    = string  * Type
+  type Ident    = string  * Type
   type Signature = Type list * Type option
   type FIdent    = string * Signature
 
@@ -41,15 +41,16 @@ struct
     | LValue  of LVAL              * Pos
     | Plus    of Exp * Exp         * Pos      (* e.g., x + 3 *)
     | Minus   of Exp * Exp         * Pos      (* e.g., x - 3 *)
- (* | Times   of Exp * Exp         * Pos      (* e.g., x * 3 *)
-    | Div     of Exp * Exp         * Pos      (* e.g., x / 3 *)         *)
+    | Times   of Exp * Exp         * Pos      (* e.g., x * 3 *)
+    | Div     of Exp * Exp         * Pos      (* e.g., x / 3 *)
     | Equal   of Exp * Exp         * Pos      (* e.g., x = 3 *)
     | Less    of Exp * Exp         * Pos      (* e.g., a < b *)
     | And     of Exp * Exp         * Pos      (* e.g., (x<1) and y *)
- (* | Or      of Exp * Exp         * Pos      (* e.g., (x=5) or y *)
-    | Not     of Exp               * Pos      (* e.g., not (x>3) *)      *)
+    | Or      of Exp * Exp         * Pos      (* e.g., (x=5) or y *)
+    | Not     of Exp               * Pos      (* e.g., not (x>3) *)
     | FunApp  of FIdent * Exp list * Pos      (* e.g., f(1, 3+x) *)
     | Map     of FIdent * Exp      * Pos      (* map(f,    {a1, ..., an}) == { f(a1), ..., f(an) }   *)
+    | TernIf  of Exp * Exp * Exp   * Pos      (* e.g. (x<0 ? 4 : 5) *)
 
   and Dec = Dec of Ident * Pos
 
@@ -170,12 +171,19 @@ struct
 
     | pp_exp (Plus  (e1, e2, _))    = "( " ^ pp_exp e1 ^ " + " ^ pp_exp e2 ^ " )"
     | pp_exp (Minus (e1, e2, _))    = "( " ^ pp_exp e1 ^ " - " ^ pp_exp e2 ^ " )"
+    | pp_exp (Times (e1, e2, _))    = "( " ^ pp_exp e1 ^ " * " ^ pp_exp e2 ^ " )"
+    | pp_exp (Div   (e1, e2, _))    = "( " ^ pp_exp e1 ^ " * " ^ pp_exp e2 ^ " )"
     | pp_exp (Equal (e1, e2, _))    = "( " ^ pp_exp e1 ^ " = " ^ pp_exp e2 ^ " )"
     | pp_exp (Less  (e1, e2, _))    = "( " ^ pp_exp e1 ^ " < " ^ pp_exp e2 ^ " )"
     | pp_exp (And   (e1, e2, _))    = "( " ^ pp_exp e1 ^ " & " ^ pp_exp e2 ^ " )"
+    (* we let or be represented by || in the pretty-printing *)
+    | pp_exp (Or    (e1, e2, _))    = "( " ^ pp_exp e1 ^ " || " ^ pp_exp e2 ^ " )"
+    | pp_exp (Not   (e1,     _))    = "( " ^ "not " ^ pp_exp e1 ^ " )"
 
     | pp_exp (FunApp ((nm,_), args, _)) = nm ^ "( " ^ pp_exps args ^ " )"
     | pp_exp (Map    ((nm,_), arr , _)) = "map ( " ^ nm ^ ", " ^ pp_exp arr ^ " ) "
+
+    | pp_exp (TernIf (e1, e2, e3, _)) = "( " ^ pp_exp e1 ^ " ? " ^ pp_exp e2 ^ " : " ^ pp_exp e3 ^ " )"
 
   (******************************)
   (*** pretty printing a type ***)
@@ -334,9 +342,13 @@ struct
     | typeOfExp ( ArrLit (_,t,_) ) = t
     | typeOfExp ( Plus   (a,b,_) ) = typeOfExp a
     | typeOfExp ( Minus  (a,b,_) ) = typeOfExp a
+    | typeOfExp ( Times  (a,b,_) ) = typeOfExp a
+    | typeOfExp ( Div    (a,b,_) ) = typeOfExp a
     | typeOfExp ( Equal  (_,_,_) ) = BType Bool
     | typeOfExp ( Less   (_,_,_) ) = BType Bool
     | typeOfExp ( And    (_,_,_) ) = BType Bool
+    | typeOfExp ( Or     (_,_,_) ) = BType Bool
+    | typeOfExp ( Not    (_,_)   ) = BType Bool
 
     | typeOfExp ( LValue (Var    (_,t)      , _) ) = t
     | typeOfExp ( LValue (Index ((v,t),inds), p) ) =
@@ -365,6 +377,7 @@ struct
     | typeOfExp ( Map    ((fid,(_,NONE)),a,p) ) =
         raise Error("In typeOfExp of Map, function "^fid^
                     " lacks return type, at ", p)
+    | typeOfExp ( TernIf (_, e2, _, _)) = typeOfExp e2
 
   (*  typeOfStmt( e : Stmt   ) : Type option *)
   fun typeOfStmt( Return (SOME e,_) ) = SOME (typeOfExp e)
@@ -385,11 +398,16 @@ struct
     | posOfExp  ( LValue (_,  p) ) = p
     | posOfExp  ( Plus   (_,_,p) ) = p
     | posOfExp  ( Minus  (_,_,p) ) = p
+    | posOfExp  ( Times  (_,_,p) ) = p
+    | posOfExp  ( Div    (_,_,p) ) = p
     | posOfExp  ( Equal  (_,_,p) ) = p
     | posOfExp  ( Less   (_,_,p) ) = p
     | posOfExp  ( And    (_,_,p) ) = p
+    | posOfExp  ( Or     (_,_,p) ) = p
+    | posOfExp  ( Not    (_,  p) ) = p
     | posOfExp  ( FunApp (_,_,p) ) = p
     | posOfExp  ( Map    (_,_,p) ) = p
+    | posOfExp  (TernIf  (_,_,_,p))= p
 
   (*  posOfStmt ( s : Stmt ) : Pos *)
   fun posOfStmt ( Return (_,  p) ) = p

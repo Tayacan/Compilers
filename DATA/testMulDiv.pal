@@ -1,0 +1,19 @@
+program testmuldiv;
+
+procedure main()
+var
+   x1 : int;
+   x2 : int;
+
+begin
+
+   x1 := 4 * 3;
+   x2 := x1 * 5 * x1;
+
+   // expecting 12 and 720, respectively
+   write(x1);
+   write('\n');
+   write(x2);
+   write('\n');
+
+end; // main

@@ -202,12 +202,22 @@ struct
         end
 
     (* Task 2: Some code-generation of operators should occur here. *)
-(*
+
     | compileExp( vtable, Times(e1, e2, pos), place ) =
-        raise Error ( "Task 2 not implemented yet in code generator ", pos )
+        let val t1 = "times1_" ^ newName()
+            val c1 = compileExp(vtable, e1, t1)
+            val t2 = "times2_" ^ newName()
+            val c2 = compileExp(vtable, e2, t2)
+        in c1 @ c2 @ [Mips.MUL (place, t1, t2)]
+        end
+
     | compileExp( vtable, Div(e1, e2, pos), place ) =
-        raise Error ( "Task 2 not implemented yet in code generator ", pos )
-*)
+       let val t1 = "div1_" ^ newName()
+           val c1 = compileExp(vtable, e1, t1)
+           val t2 = "div2_" ^ newName()
+           val c2 = compileExp(vtable, e2, t2)
+       in c1 @ c2 @ [Mips.DIV (place, t1, t2)]
+       end
 
     | compileExp( vtable, Equal(e1, e2, _), place ) =
         let val t1 = "eq1_" ^ newName()
@@ -235,18 +245,30 @@ struct
             val c2 = compileExp(vtable, e2, t2)
             val lA = "_and_" ^ newName()
         in c1 (* do first part, skip 2nd part if already false *)
-           @ [Mips.MOVE (t1,place), Mips.BEQ (place, "0", lA) ]
+           @ [Mips.MOVE (place,t1), Mips.BEQ (place, "0", lA) ]
            @ c2 (* when here, t1 was  true, so the result is t2 *)
-           @ [Mips.MOVE (t2, place), Mips.LABEL lA ]
+           @ [Mips.MOVE (place,t2), Mips.LABEL lA ]
         end
 
     (* Task 2: Some code-generation of operators should occur here. *)
-(*
+
     | compileExp( vtable, Or(e1, e2, pos), place ) =
-        raise Error ( "Task 2 not implemented yet in code generator ", pos )
+        let val t1 = "or1_" ^ newName()
+            val c1 = compileExp(vtable, e1, t1)
+            val t2 = "or2_" ^ newName()
+            val c2 = compileExp(vtable, e2, t2)
+            val lA = "_or_" ^ newName()
+        in c1 (* do first part, skip 2nd part if already true *)
+           @ [Mips.MOVE (place,t1), Mips.BEQ (place, "1", lA) ]
+           @ c2 (* when here, t1 was  false, so the result is t2 *)
+           @ [Mips.MOVE (place,t2), Mips.LABEL lA ]
+        end
     | compileExp( vtable, Not(e1, pos), place ) =
-        raise Error ( "Task 2 not implemented yet in code generator ", pos )
-*)
+        let val t1 = "not_" ^ newName()
+            val c1 = compileExp(vtable, e1, t1)
+        in c1 @ [Mips.XORI (place, t1, "1")]
+        end
+
 
     | compileExp( vtab, FunApp (("len",(_,_)),args,pos), place ) =
        ( case args of
@@ -394,6 +416,21 @@ struct
     | compileExp( vtable, Map( (id,_), arr_exp, pos ), place ) =
         raise Error("Map Is Currently Unimplemented, at ", pos)
 
+    (* compile the ternary expression e.g. (x>0 ? 4 : 5)
+     * probably incorrect! Return to place? *)
+    | compileExp ( vtable, TernIf (cond, e1, e2, pos), place ) =
+            raise Error ("Compile of ternary expression has not been implemented yet", pos)
+(*          let val ereg  = "_ternif_"    ^ newName()
+              val els   = "_:_"         ^ newName()
+              val endl  = "_endternif_" ^ newName()
+              val codeC = compileExp(vtable, cond, ereg)
+              val codeT = compileExp e1 vtable place
+              val codeE = compileExp e2 vtable place
+          in codeC @ [ Mips.BEQ (ereg, "0", els) ]
+             @ codeT @ [ Mips.J endl]
+             @ ( Mips.LABEL els) :: codeE @ [ Mips.LABEL endl ]
+          end
+*)
 
   (* move args to callee registers *)
   and putArgs [] vtable reg =

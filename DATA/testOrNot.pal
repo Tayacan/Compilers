@@ -1,0 +1,19 @@
+program testOrNot;
+
+procedure main()
+var
+   x1 : int;
+   x2 : int;
+
+begin
+
+   x1 := 4;
+   x2 := 6;
+
+   // expecting 0 1, respectively
+   write(not(x1<x2));
+   write('\n');
+   write(x2<x1 or x1<x2);
+   write('\n');
+
+end; // main
