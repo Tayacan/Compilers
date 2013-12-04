@@ -1,4 +1,4 @@
-Inference;
+program Inference;
 
 function f(a : int) : char
 begin
