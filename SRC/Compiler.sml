@@ -250,7 +250,7 @@ struct
            @ [Mips.MOVE (place,t2), Mips.LABEL lA ]
         end
 
-    (* Task 2: Some code-generation of operators should occur here. *)
+    (* Task 2: Or and Not implemented: *)
 
     | compileExp( vtable, Or(e1, e2, pos), place ) =
         let val t1 = "or1_" ^ newName()
@@ -263,6 +263,7 @@ struct
            @ c2 (* when here, t1 was  false, so the result is t2 *)
            @ [Mips.MOVE (place,t2), Mips.LABEL lA ]
         end
+
     | compileExp( vtable, Not(e1, pos), place ) =
         let val t1 = "not_" ^ newName()
             val c1 = compileExp(vtable, e1, t1)

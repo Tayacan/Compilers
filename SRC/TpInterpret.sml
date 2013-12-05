@@ -476,7 +476,7 @@ and evalExp ( Literal(lit,_), vtab, ftab ) = lit
         in  evalBinop(op -, res1, res2, pos)
         end
 
-    (* Task 2: Some evaluation of operators should occur here. *)
+    (* Task 2: Multiplication and division implemented: *)
   | evalExp ( Times(e1, e2, pos), vtab, ftab ) =
         let val res1   = evalExp(e1, vtab, ftab)
             val res2   = evalExp(e2, vtab, ftab)
@@ -517,6 +517,14 @@ and evalExp ( Literal(lit,_), vtab, ftab ) = lit
 
   | evalExp ( Not(e1, pos), vtab, ftab ) =
         evalNot(evalExp (e1, vtab, ftab), pos)
+
+  (* added evaluation of ternary if-expression *)
+  | evalExp ( TernIf(cond, e1, e2, pos), vtab, ftab ) =
+        (case evalExp (cond, vtab, ftab) of
+             BVal (Log b) => if b then evalExp (e1, vtab, ftab)
+                                  else evalExp (e1, vtab, ftab)
+           | _ => raise Error ("TernIf: Condition has to be a boolean", pos))
+
 
   (************************************************************************)
   (** application of regular functions, i.e., defined in the program     **)
