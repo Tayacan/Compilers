@@ -1,0 +1,15 @@
+program zerodivision;
+
+procedure main()
+var
+   x1 : int;
+
+begin
+
+   x1 := 4/0;
+
+   write("division by zero terminated with result: ");
+   write(x1);
+   write('\n');
+
+end; // main
