@@ -83,13 +83,8 @@ Type-checking of multiplication, division and \texttt{or} was done by using the 
         end
 \end{verbatim}
 \section{Testing}
-<<<<<<< HEAD
-All of the Paladim-programs in \texttt{DATA}-folder has been successfully parsed, although 
-we had to correct the syntax error in the first line of \texttt{testTypeInference.pal}.
-(The keyword \texttt{program} was missing before the name of the program.)
-=======
 Most of the testing has been done using a small test-framework that we built. The framework
-first parses all the files in the \texttt{DATA} folder. For each file, it outputs either
+first parses all the files in the \texttt{DATA} folder\footnote{We had to fix a syntax error in testTypeInference.pal -- the program didn't start with \texttt{program}}. For each file, it outputs either
 \texttt{FAIL} or \texttt{OK}, depending on whether any exceptions were raised. This tells us
 that all the test files are parsed without exceptions, but not that they are parsed correctly.
 For that, we need some syntax tree to compare against.
@@ -110,7 +105,6 @@ In addition to all of the above, we have verified that we can compile the Paladi
 use it to interpret and compile many of the programs in the \texttt{DATA} folder (all the
 ones that do not need the other tasks to be completed), and that we get the correct output
 from these programs.
->>>>>>> 44305094085c145332461a5a3513f5981234981d
 
 \section{Ideas for other tasks}
 \subsection{Type-checking}
