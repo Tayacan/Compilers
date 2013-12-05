@@ -5,3 +5,7 @@
 Mars4_*.jar
 *.synctex.gz
 *.swp
+*.pdf
+*.aux
+*.log
+*.toc
