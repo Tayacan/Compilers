@@ -27,6 +27,61 @@ transformations of the grammar:
         %operators. Otherwise, it wouldn't be able to know what kind of operator (if any)
         %the preceding expression contained.$
 \end{enumerate}
+
+\section{Integer multiplication and division and \texttt{or} and \texttt{not}}
+Multiplication and division for integers and the missing boolean operators has been succesfully implemented in the rest of the compiler, that is for both interpretation and compilation. The first two has been implemented mostly by just imitating the implementation of addition and subtraction. E.g. in \texttt{Compiler.sml} the clauses in \texttt{compileExp} for subtraction and multiplication look very similar:
+\begin{verbatim}
+    | compileExp( vtable, Minus(e1, e2, _), place ) =
+        let val t1 = "minus1_" ^ newName()
+            val c1 = compileExp(vtable, e1, t1)
+            val t2 = "minus2_" ^ newName()
+            val c2 = compileExp(vtable, e2, t2)
+        in c1 @ c2 @ [Mips.SUB (place,t1,t2)]
+        end
+
+    (* Task 2: Integer multiplication and division implemented: *)
+
+    | compileExp( vtable, Times(e1, e2, _), place ) =
+        let val t1 = "times1_" ^ newName()
+            val c1 = compileExp(vtable, e1, t1)
+            val t2 = "times2_" ^ newName()
+            val c2 = compileExp(vtable, e2, t2)
+        in c1 @ c2 @ [Mips.MUL (place, t1, t2)]
+        end
+\end{verbatim}
+The boolean operator \texttt{or} was implemented similarly to \texttt{and}. The only difference in \texttt{Compiler.sml} is that we only have to check the second expression if the first expression is false, whereas for \texttt{and} we only check the second expression if the first is true. This was simply done by branching (and thus skipping the second evaluation), when the first is equal to 1 instead of 0.\newline
+\texttt{not} was implemented in \texttt{Compile.sml} by simply XOR'ing the boolean value with 1, as \texttt{not x = x XOR 1}:
+\begin{verbatim}
+    | compileExp( vtable, Not(e1, pos), place ) =
+        let val t1 = "not_" ^ newName()
+            val c1 = compileExp(vtable, e1, t1)
+        in c1 @ [Mips.XORI (place, t1, "1")]
+        end
+\end{verbatim}
+Interpretation of the boolean operators was done by adding functions \texttt{evalOr} and \texttt{evalNot} equivalent to the existing \texttt{evalAnd}:
+\begin{verbatim}
+fun evalOr (BVal (Log b1), BVal (Log b2), pos) = BVal (Log (b1 orelse b2))
+  | evalOr (v1, v2, pos) =
+        raise Error( "Or: argument types do not match. Arg1: " ^
+                      pp_val v1 ^ ", arg2: " ^ pp_val v2, pos )
+
+fun evalNot (BVal (Log b1), pos) = BVal (Log (not b1))
+  | evalNot (v1, pos) =
+        raise Error( "Not: argument: " ^ pp_val v1 ^ " must be boolean", pos )
+\end{verbatim}
+and filling out the missing clauses in evalExp.
+Interpretation of multiplication and division was done equivalent to that of addition and subtraction. First evaluate nested expressions and then let \texttt{evalBinop} do the actual evaluation of the relevant operation.
+Type-checking of multiplication, division and \texttt{or} was done by using the code for type-checking addition and \texttt{and}. Type-checking \texttt{not}-expressions was only a little bit different from type-chekcing \texttt{and} and \texttt{or} as it takes only one argument:
+\begin{verbatim}
+    | typeCheckExp ( vtab, AbSyn.Not (e,    pos), _ ) =
+        let val e_new = typeCheckExp(vtab, e, UnknownType )
+            val e_type= typeOfExp e_new
+        in  if  typesEqual(BType Bool, e_type)
+            then Not(e_new, pos)
+            else raise Error("in type check and exp, one argument is not of bool type "^
+                             pp_type e_type  ^ " at ", pos)
+        end
+\end{verbatim}
 \section{Testing}
 <<<<<<< HEAD
 All of the Paladim-programs in \texttt{DATA}-folder has been successfully parsed, although 
@@ -58,8 +113,6 @@ from these programs.
 >>>>>>> 44305094085c145332461a5a3513f5981234981d
 
 \section{Ideas for other tasks}
-\subsection{Integer multiplication and division etc.}
-We expect to implement multiplication, division and \texttt{or} similarly to the existing implementation of plus, minus and \texttt{and}, respectivly in \texttt{Compiler.sml} just byusing the corresponding MIPS-instructions.
 \subsection{Type-checking}
 
 \subsection{Indexing into arrays}
