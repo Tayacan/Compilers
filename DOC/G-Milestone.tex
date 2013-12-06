@@ -144,5 +144,6 @@ Type-checking of multiplication, division and \texttt{or} was done by using the 
 \end{lstlisting}
 
 \subsection{Type-checking}
+The idea is to use the ability to 'guess' the type of an expression by replacing \texttt{UnknownType} in calls to \texttt{typeCheckExp} with the acutal expected type whenever there is one. E.g. when checking an equality-expression we should use the checked type of the first expression as the expected type for the second, as the two should have the same type.
 
 \end{document}
