@@ -5,7 +5,7 @@
 \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
 
 \lstdefinelanguage{SML}{
-    morekeywords={ if, val, fun, let, in, end, then, else, andalso, orelse },% ifelse, else, repeat, until, to, downto, return, and, or},
+    morekeywords={ if, val, fun, let, in, end, then, else, andalso, orelse },
     morecomment=[s]{(*}{*)},
     morestring=[bd]',
     morestring=[bd]",
@@ -18,6 +18,7 @@
     numberstyle=\color{black},
     showstringspaces=false,
     language=SML,
+    frame=single,
     basicstyle=\ttfamily\color{red!80!black},
       keywordstyle=\bfseries\color{blue},
       commentstyle=\color{green!40!black},
@@ -86,8 +87,7 @@ The boolean operator \texttt{or} was implemented similarly to \texttt{and}. The 
 \end{lstlisting}
 Interpretation of the boolean operators was done by adding functions \texttt{evalOr} and \texttt{evalNot} equivalent to the existing \texttt{evalAnd}:
 \begin{lstlisting}
-fun evalOr (BVal (Log b1), BVal (Log b2), pos) =
-                                    BVal (Log (b1 orelse b2))
+fun evalOr (BVal (Log b1), BVal (Log b2), pos) = BVal (Log (b1 orelse b2))
   | evalOr (v1, v2, pos) =
         raise Error( "Or: argument types do not match. Arg1: " ^
                       pp_val v1 ^ ", arg2: " ^ pp_val v2, pos )
@@ -106,8 +106,7 @@ Type-checking of multiplication, division and \texttt{or} was done by using the 
             val e_type= typeOfExp e_new
         in  if  typesEqual(BType Bool, e_type)
             then Not(e_new, pos)
-            else raise Error("in type check and exp, one
-                              argument is not of bool type "^
+            else raise Error("in type check and exp, one argument is not of bool type "^
                              pp_type e_type  ^ " at ", pos)
         end
 \end{lstlisting}
