@@ -55,7 +55,32 @@ transformations of the grammar:
         %the preceding expression contained.$
 \end{enumerate}
 
-\section{Integer multiplication and division and \texttt{or} and \texttt{not}}
+\section{Testing}
+Most of the testing has been done using a small test-framework that we built. The framework
+first parses all the files in the \texttt{DATA} folder\footnote{We had to fix a syntax error in testTypeInference.pal -- the program didn't start with \texttt{program}}. For each file, it outputs either
+\texttt{FAIL} or \texttt{OK}, depending on whether any exceptions were raised. This tells us
+that all the test files are parsed without exceptions, but not that they are parsed correctly.
+For that, we need some syntax tree to compare against.
+
+However, it would be far too much work to manually type syntax trees for each test file. We do
+some tests that parse some code and compare the result against a hard-coded syntax tree, but
+we have only done this for a few small pieces of code.
+
+Again, the test framework outputs either \texttt{FAIL} or \texttt{OK} for each piece of code,
+depending on whether the result matched the hard-coded syntax tree or not.
+
+A nicer and easier way of testing would be to use the old LL1Parser as a reference. There are
+a few problems with this, though. First, it would require that we kept an additional lexer
+which used the old token type. Second, the LL1Parser can't parse everything in the Paladim
+grammar -- there are contructions we wouldn't be able to test at all using this approach.
+
+In addition to all of the above, we have verified that we can compile the Paladim binary and
+use it to interpret and compile many of the programs in the \texttt{DATA} folder (all the
+ones that do not need the other tasks to be completed), and that we get the correct output
+from these programs.
+
+\section{Status for other tasks}
+\subsection{Integer multiplication and division and \texttt{or} and \texttt{not}}
 Multiplication and division for integers and the missing boolean operators has been succesfully implemented in the rest of the compiler, that is for both interpretation and compilation. The first two has been implemented mostly by just imitating the implementation of addition and subtraction. E.g. in \texttt{Compiler.sml} the clauses in \texttt{compileExp} for subtraction and multiplication look very similar:
 \begin{lstlisting}
     | compileExp( vtable, Minus(e1, e2, _), place ) =
@@ -110,31 +135,7 @@ Type-checking of multiplication, division and \texttt{or} was done by using the 
                              pp_type e_type  ^ " at ", pos)
         end
 \end{lstlisting}
-\section{Testing}
-Most of the testing has been done using a small test-framework that we built. The framework
-first parses all the files in the \texttt{DATA} folder\footnote{We had to fix a syntax error in testTypeInference.pal -- the program didn't start with \texttt{program}}. For each file, it outputs either
-\texttt{FAIL} or \texttt{OK}, depending on whether any exceptions were raised. This tells us
-that all the test files are parsed without exceptions, but not that they are parsed correctly.
-For that, we need some syntax tree to compare against.
 
-However, it would be far too much work to manually type syntax trees for each test file. We do
-some tests that parse some code and compare the result against a hard-coded syntax tree, but
-we have only done this for a few small pieces of code.
-
-Again, the test framework outputs either \texttt{FAIL} or \texttt{OK} for each piece of code,
-depending on whether the result matched the hard-coded syntax tree or not.
-
-A nicer and easier way of testing would be to use the old LL1Parser as a reference. There are
-a few problems with this, though. First, it would require that we kept an additional lexer
-which used the old token type. Second, the LL1Parser can't parse everything in the Paladim
-grammar -- there are contructions we wouldn't be able to test at all using this approach.
-
-In addition to all of the above, we have verified that we can compile the Paladim binary and
-use it to interpret and compile many of the programs in the \texttt{DATA} folder (all the
-ones that do not need the other tasks to be completed), and that we get the correct output
-from these programs.
-
-\section{Ideas for other tasks}
 \subsection{Type-checking}
 
 \subsection{Indexing into arrays}
