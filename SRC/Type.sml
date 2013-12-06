@@ -107,6 +107,18 @@ struct
   (*  typeCheckExp(vtab : VTab, exp : AbSyn.Exp, expected_type : TpAbSyn.Type ) : TpAbSyn.Exp *)
   fun typeCheckExp( vtab, AbSyn.Literal(AbSyn.BVal v, pos), _ ) =
         Literal(BVal (toTpBValue v), pos)
+  (*  type-checking for the ternary operator AbSyn.TernIf *)
+    | typeCheckExp( vtab, AbSyn.TernIf(cond, e1, e2, pos), _) =
+        let val new_cond = typeCheckExp( vtab, cond, KnownType (BType Bool) )
+            val cond_tp  = typeOfExp     new_cond
+            val new_e1   = typeCheckExp( vtab, e1, UnknownType )
+            val new_e2   = typeCheckExp( vtab, e2, UnknownType )
+            (* e1 and e2 has to be of same type *)
+            val sameType = typesEqual ( typeOfExp new_e1, typeOfExp new_e2 )
+        in  if  typesEqual( cond_tp, BType Bool ) andalso sameType (* !! *)
+            then TernIf( new_cond, new_e1, new_e2, pos)
+            else raise Error("in type check of ternary operator, illegal condition type "^pp_type cond_tp^" at ", pos)
+        end
     | typeCheckExp( vtab, AbSyn.Literal(AbSyn.Arr  _, pos), _ ) =
         raise Error("in type check array value expression: array value " ^
                     " should not have been built (interpretation only), at ", pos)

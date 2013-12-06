@@ -417,6 +417,22 @@ struct
     | compileExp( vtable, Map( (id,_), arr_exp, pos ), place ) =
         raise Error("Map Is Currently Unimplemented, at ", pos)
 
+    (* compile the ternary expression e.g. (x>0 ? 4 : 5)
+     * probably incorrect! Return to place? *)
+    | compileExp ( vtable, TernIf (cond, e1, e2, pos), place ) =
+            raise Error ("Compile of ternary expression has not been implemented yet", pos)
+(*          let val ereg  = "_ternif_"    ^ newName()
+              val els   = "_:_"         ^ newName()
+              val endl  = "_endternif_" ^ newName()
+              val codeC = compileExp(vtable, cond, ereg)
+              val codeT = compileExp e1 vtable place
+              val codeE = compileExp e2 vtable place
+          in codeC @ [ Mips.BEQ (ereg, "0", els) ]
+             @ codeT @ [ Mips.J endl]
+             @ ( Mips.LABEL els) :: codeE @ [ Mips.LABEL endl ]
+          end
+*)
+
   (* move args to callee registers *)
   and putArgs [] vtable reg =
         ([], reg)

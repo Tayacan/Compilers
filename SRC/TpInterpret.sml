@@ -518,6 +518,13 @@ and evalExp ( Literal(lit,_), vtab, ftab ) = lit
   | evalExp ( Not(e1, pos), vtab, ftab ) =
         evalNot(evalExp (e1, vtab, ftab), pos)
 
+  (* added evaluation of ternary if-expression *)
+  | evalExp ( TernIf(cond, e1, e2, pos), vtab, ftab ) =
+        (case evalExp (cond, vtab, ftab) of
+             BVal (Log b) => if b then evalExp (e1, vtab, ftab)
+                                  else evalExp (e2, vtab, ftab)
+           | _ => raise Error ("TernIf: Condition has to be a boolean", pos))
+
 
   (************************************************************************)
   (** application of regular functions, i.e., defined in the program     **)
