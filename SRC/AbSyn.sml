@@ -40,7 +40,6 @@ struct
     | Or      of Exp * Exp         * Pos      (* e.g., (x=5) or y *)
     | Not     of Exp               * Pos      (* e.g., not (x>3) *)
     | FunApp  of Ident  * Exp list * Pos      (* e.g., f(1, 3+x) *)
-    | TernIf  of Exp * Exp * Exp   * Pos      (* e.g., (x>0 ? 4 : 5) *)
 
   and Dec = Dec of Ident * Type * Pos
 

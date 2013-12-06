@@ -50,7 +50,6 @@ struct
     | Not     of Exp               * Pos      (* e.g., not (x>3) *)
     | FunApp  of FIdent * Exp list * Pos      (* e.g., f(1, 3+x) *)
     | Map     of FIdent * Exp      * Pos      (* map(f,    {a1, ..., an}) == { f(a1), ..., f(an) }   *)
-    | TernIf  of Exp * Exp * Exp   * Pos      (* e.g. (x<0 ? 4 : 5) *)
 
   and Dec = Dec of Ident * Pos
 
@@ -183,7 +182,6 @@ struct
     | pp_exp (FunApp ((nm,_), args, _)) = nm ^ "( " ^ pp_exps args ^ " )"
     | pp_exp (Map    ((nm,_), arr , _)) = "map ( " ^ nm ^ ", " ^ pp_exp arr ^ " ) "
 
-    | pp_exp (TernIf (e1, e2, e3, _)) = "( " ^ pp_exp e1 ^ " ? " ^ pp_exp e2 ^ " : " ^ pp_exp e3 ^ " )"
 
   (******************************)
   (*** pretty printing a type ***)
@@ -377,7 +375,6 @@ struct
     | typeOfExp ( Map    ((fid,(_,NONE)),a,p) ) =
         raise Error("In typeOfExp of Map, function "^fid^
                     " lacks return type, at ", p)
-    | typeOfExp ( TernIf (_, e2, _, _)) = typeOfExp e2
 
   (*  typeOfStmt( e : Stmt   ) : Type option *)
   fun typeOfStmt( Return (SOME e,_) ) = SOME (typeOfExp e)
@@ -407,7 +404,6 @@ struct
     | posOfExp  ( Not    (_,  p) ) = p
     | posOfExp  ( FunApp (_,_,p) ) = p
     | posOfExp  ( Map    (_,_,p) ) = p
-    | posOfExp  (TernIf  (_,_,_,p))= p
 
   (*  posOfStmt ( s : Stmt ) : Pos *)
   fun posOfStmt ( Return (_,  p) ) = p
