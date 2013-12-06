@@ -69,6 +69,14 @@ we have only done this for a few small pieces of code.
 Again, the test framework outputs either \texttt{FAIL} or \texttt{OK} for each piece of code,
 depending on whether the result matched the hard-coded syntax tree or not.
 
+To run the test framework, run the following commands (in the \texttt{SRC} folder):
+
+\begin{verbatim}
+$ make clean
+$ make
+$ mosml ParserTest.sml
+\end{verbatim}
+
 A nicer and easier way of testing would be to use the old LL1Parser as a reference. There are
 a few problems with this, though. First, it would require that we kept an additional lexer
 which used the old token type. Second, the LL1Parser can't parse everything in the Paladim
@@ -139,7 +147,5 @@ Type-checking of multiplication, division and \texttt{or} was done by using the 
 \subsection{Type-checking}
 
 \subsection{Indexing into arrays}
-
-
 
 \end{document}
