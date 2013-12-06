@@ -1,5 +1,31 @@
 \documentclass{article}
 
+\usepackage{listings}
+\usepackage{color}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+
+\lstdefinelanguage{SML}{
+    morekeywords={ if, val, fun, let, in, end, then, else, andalso, orelse },% ifelse, else, repeat, until, to, downto, return, and, or},
+    morecomment=[s]{(*}{*)},
+    morestring=[bd]',
+    morestring=[bd]",
+    sensitive=false,
+}
+\lstset{
+    breaklines     = true,
+    numbers        = left,
+    stepnumber     = 1,
+    numberstyle=\color{black},
+    showstringspaces=false,
+    language=SML,
+    basicstyle=\ttfamily\color{red!80!black},
+      keywordstyle=\bfseries\color{blue},
+      commentstyle=\color{green!40!black},
+      identifierstyle=\ttfamily\color{black},
+      stringstyle=\color{yellow!65!black},
+}  
+
+
 \title{Paladim - Milestone hand-in}
 \author{}
 
@@ -30,7 +56,7 @@ transformations of the grammar:
 
 \section{Integer multiplication and division and \texttt{or} and \texttt{not}}
 Multiplication and division for integers and the missing boolean operators has been succesfully implemented in the rest of the compiler, that is for both interpretation and compilation. The first two has been implemented mostly by just imitating the implementation of addition and subtraction. E.g. in \texttt{Compiler.sml} the clauses in \texttt{compileExp} for subtraction and multiplication look very similar:
-\begin{verbatim}
+\begin{lstlisting}
     | compileExp( vtable, Minus(e1, e2, _), place ) =
         let val t1 = "minus1_" ^ newName()
             val c1 = compileExp(vtable, e1, t1)
@@ -48,18 +74,18 @@ Multiplication and division for integers and the missing boolean operators has b
             val c2 = compileExp(vtable, e2, t2)
         in c1 @ c2 @ [Mips.MUL (place, t1, t2)]
         end
-\end{verbatim}
+\end{lstlisting}
 The boolean operator \texttt{or} was implemented similarly to \texttt{and}. The only difference in \texttt{Compiler.sml} is that we only have to check the second expression if the first expression is false, whereas for \texttt{and} we only check the second expression if the first is true. This was simply done by branching (and thus skipping the second evaluation), when the first is equal to 1 instead of 0.\newline
 \texttt{not} was implemented in \texttt{Compile.sml} by simply XOR'ing the boolean value with 1, as \texttt{not x = x XOR 1}:
-\begin{verbatim}
+\begin{lstlisting}
     | compileExp( vtable, Not(e1, pos), place ) =
         let val t1 = "not_" ^ newName()
             val c1 = compileExp(vtable, e1, t1)
         in c1 @ [Mips.XORI (place, t1, "1")]
         end
-\end{verbatim}
+\end{lstlisting}
 Interpretation of the boolean operators was done by adding functions \texttt{evalOr} and \texttt{evalNot} equivalent to the existing \texttt{evalAnd}:
-\begin{verbatim}
+\begin{lstlisting}
 fun evalOr (BVal (Log b1), BVal (Log b2), pos) =
                                     BVal (Log (b1 orelse b2))
   | evalOr (v1, v2, pos) =
@@ -70,11 +96,11 @@ fun evalNot (BVal (Log b1), pos) = BVal (Log (not b1))
   | evalNot (v1, pos) =
         raise Error( "Not: argument: " ^ pp_val v1 ^ " must be
                                     boolean", pos )
-\end{verbatim}
+\end{lstlisting}
 and filling out the missing clauses in evalExp.
 Interpretation of multiplication and division was done equivalent to that of addition and subtraction. First evaluate nested expressions and then let \texttt{evalBinop} do the actual evaluation of the relevant operation.
 Type-checking of multiplication, division and \texttt{or} was done by using the code for type-checking addition and \texttt{and}. Type-checking \texttt{not}-expressions was only a little bit different from type-chekcing \texttt{and} and \texttt{or} as it takes only one argument:
-\begin{verbatim}
+\begin{lstlisting}
     | typeCheckExp ( vtab, AbSyn.Not (e,    pos), _ ) =
         let val e_new = typeCheckExp(vtab, e, UnknownType )
             val e_type= typeOfExp e_new
@@ -84,7 +110,7 @@ Type-checking of multiplication, division and \texttt{or} was done by using the 
                               argument is not of bool type "^
                              pp_type e_type  ^ " at ", pos)
         end
-\end{verbatim}
+\end{lstlisting}
 \section{Testing}
 Most of the testing has been done using a small test-framework that we built. The framework
 first parses all the files in the \texttt{DATA} folder\footnote{We had to fix a syntax error in testTypeInference.pal -- the program didn't start with \texttt{program}}. For each file, it outputs either
