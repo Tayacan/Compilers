@@ -314,25 +314,19 @@ struct
         (* function call to `new' uses expected type to infer the to-be-read result *)
     | typeCheckExp ( vtab, AbSyn.FunApp ("new", args, pos), etp ) =
         ( case expectedBasicType etp of
-            SOME btp => raise Error("in type check new UNIMPLEMENTED, i.e., G-ASSIGNMENT task 3, at ", pos)
-                        (*************************************************************)
-                        (*** Suggested implementation STEPS:                       ***)
-                        (***    1. type check recursively all `args', denote the   ***)
-                        (***          resulting (typed) arguments `new_args'.      ***)
-                        (***          (hint: the arguments of new should be ints,  ***)
-                        (***             hence expected type is ... ? )            ***)
-                        (***    2. get the types of `new_args' (via typeOfExp),    ***)
-                        (***          denote them `arg_tps'                        ***)
-                        (***    3. check that all `arg_tps' are ints, i.e,BType Int***)
-                        (***    4. type of the result array is                     ***)
-                        (***           `rtp = Array ( length args, btp )'          ***)
-                        (***         and check the rank of the array is > 0        ***)
-                        (***                                                       ***)
-                        (***    5. Result should be smth like                      ***)
-                        (***       `FunApp(                                        ***)
-                        (***          ("new", (arg_tps, SOME rtp)), new_args, pos  ***)
-                        (***        )'                                             ***)
-                        (*************************************************************)
+            SOME btp => let val new_args = map (fn a => typeCheckExp (vtab,a,KnownType (BType Int))) args
+                            val arg_tps = map typeOfExp new_args
+                        in if not (foldl (fn (t,b) => (b andalso
+                                   typesEqual(BType Int, t))) true arg_tps)
+                           then raise Error("in type check call to new," ^
+                                            "all args must be integers, at ", pos)
+                           else if length new_args > 0
+                                then FunApp ( ("new", (arg_tps, SOME (Array(length new_args, btp))))
+                                            , new_args, pos)
+                                else raise Error("in type check call to new,"^
+                                                 "new must have at least one" ^
+                                                 "argument, at ",pos)
+                        end
           | NONE     => raise Error("in type check call to new, type inference fails because "^
                                     "of unknwon expected basic type, at ", pos) )
 
