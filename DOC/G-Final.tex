@@ -144,9 +144,73 @@ Type-checking of multiplication, division and \texttt{or} was done by using the 
 
 \subsection{Testing the new operators}
 
-\section{Type-checking of read and new}
+\section{Type-checking of \texttt{read} and \texttt{new}}
 %The idea is to use the ability to 'guess' the type of an expression by replacing \texttt{UnknownType} in calls to \texttt{typeCheckExp} with the acutal expected type whenever there is one. E.g. when checking an equality-expression we should use the checked type of the first expression as the expected type for the second, as the two should have the same type.
 
+\subsection{Type-checking of \texttt{read}}
+The return type of a \texttt{read()} call is determined by the context -- if it's assigned to some variable, for example, the return type is the type of that variable, or if it's used in an arithmethic expression, it must be an integer.
 
+In order to determine this, we use the last parameter of \texttt{typeCheckExp}, the expected type. In any case where we know what the type of a sub-expression should be, we send that type along as a \texttt{KnownType}. For example, here's the updated code for type-checking a plus-expression:
+
+\begin{lstlisting}
+    | typeCheckExp(vtab, AbSyn.Plus (e1, e2, pos),_) =
+        let val e1_new = typeCheckExp( vtab, e1, KnownType (BType Int))
+            val e2_new = typeCheckExp( vtab, e2, KnownType (BType Int))
+            val (tp1, tp2) = (typeOfExp e1_new, typeOfExp e2_new)
+        in  if  typesEqual(BType Int, tp1) andalso typesEqual(BType Int, tp2)
+            then Plus(e1_new, e2_new, pos)
+            else raise Error(...)
+        end
+\end{lstlisting}
+
+It's as simple as replacing each instance of \texttt{UnknownType} with \texttt{KnownType (BType Int)}.
+
+Comparison operators (\texttt{=} and \texttt{<}) are slightly more complex -- here, we use the type of the first expression to determine the type of the second expression, like so:
+
+\begin{lstlisting}
+    | typeCheckExp (vtab,AbSyn.Equal(e1, e2, pos),_) =
+        let val e1_new = typeCheckExp(vtab, e1, UnknownType)
+            val e2_new = typeCheckExp(vtab, e2, KnownType (typeOfExp e1_new) )
+            val (tp1, tp2) = (typeOfExp e1_new, typeOfExp e2_new)
+            (* check that tp1 is not an array type *)
+            val () = case tp1 of
+                       Array _ => raise Error(...)
+                     | _ => ()
+        in  if  typesEqual(tp1, tp2)
+            then Equal(e1_new, e2_new, pos)
+            else raise Error(...)
+        end
+\end{lstlisting}
+
+Here, the first expression still has an unknown type, and so cannot be a \texttt{read}-call.
+
+\subsection{Type-checking of \texttt{new}}
+The type-checking of \texttt{new} is done as was recommended in the comments in the code:
+
+\begin{enumerate}
+    \item Type-check all arguments with expected type \texttt{KnownType (BType Int)}
+    \item Extract a list of all the types, using \texttt{map typeOfExp}.
+    \item Check that all arguments are integers, and that there is at least one argument. If not, throw appropriate errors.
+    \item If all of the above succeeds, return the type-ckecked FunApp.
+\end{enumerate}
+
+The code looks like this:
+\begin{lstlisting}
+  | typeCheckExp ( vtab, AbSyn.FunApp ("new", args, pos), etp ) =
+  ( case expectedBasicType etp of
+      SOME btp => let val new_args = map (fn a => typeCheckExp (vtab,a,KnownType (BType Int))) args
+                      val arg_tps = map typeOfExp new_args
+                  in if not (foldl (fn (t,b) => (b andalso
+                             typesEqual(BType Int, t))) true arg_tps)
+                     then raise Error(...)
+                     else if length new_args > 0
+                          then FunApp ( ("new", (arg_tps, SOME (Array(length new_args, btp))))
+                                      , new_args, pos)
+                          else raise Error(...)
+                  end
+    | NONE     => raise Error(...) )
+\end{lstlisting}
+
+In an ideal world, type-checking all arguments with integer as the expected type should be enough to ensure that they are all integers, but \texttt{typeCheckExp} only uses the expected type in cases where it's unclear what type an expression should have, such as \texttt{read}-calls. This means that \texttt{typeCheckExp(vtab, somePlusExpression, KnownType(BType Bool))} would not fail, even though a plus expression is always an integer type.
 
 \end{document}
