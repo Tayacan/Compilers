@@ -303,7 +303,7 @@ and callFun ( (rtp : Type option, fid : string, fargs : Dec list, body : StmtBlo
             let val new_vtab = bindTypeIds(fargs, aargs, fid, pdcl, pcall)
                 val res  = execBlock( body, new_vtab, ftab )
             in  ( case (rtp, res) of
-                    (NONE , _ ) => updateOuterVtable vtab new_vtab (aexps,farg); NONE
+                    (NONE , _ ) => (updateOuterVtable vtab new_vtab (aexps,fargs); NONE)
                     (* Procedure, hence modify this code for TASK 5. *)
 
                   | (SOME t, SOME r) => if   typesEqual(t, typeOfVal r) 
@@ -331,7 +331,7 @@ and updateOuterVtable vtabOuter vtabInner (out_exp, in_arg) =
                                   SOME a => a
                                 | NONE   => raise Error("Call-by-Value-Result error for "^
                                                          name^" not existing in the symboltable" )
-        fun assignment (out_name, in_name) = read vtabOuter out_name := read vtabInner in_name ; ()
+        fun assignment (out_name, in_name) = (read vtabOuter out_name := read vtabInner in_name ; ())
     in
         app assignment updte_ids ; ()
     end
