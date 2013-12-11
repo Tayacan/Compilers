@@ -272,7 +272,7 @@ struct
         end
 
     | typeCheckExp ( vtab, AbSyn.Not (e,    pos), _ ) =
-        let val e_new = typeCheckExp(vtab, e, UnknownType )
+        let val e_new = typeCheckExp(vtab, e, KnownType (BType Bool) )
             val e_type= typeOfExp e_new
         in  if  typesEqual(BType Bool, e_type)
             then Not(e_new, pos)

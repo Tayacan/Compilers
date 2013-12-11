@@ -1,0 +1,30 @@
+program inferenceRead;
+
+function f() : bool
+    return read();
+
+procedure main()
+var n : int;
+    c : char;
+    b : bool;
+begin
+    c := 'a';
+    n := 2 + read();           // infer from use in + expr
+
+    if chr(read()) = read()    // example from the pdf
+    then c := read();          // infer from variable type
+
+    write("c = ");
+    write(c);
+    write("\n");
+
+    write("n = ");
+    write(n);
+    write("\n");
+
+    b := f();                  // infer from function return type
+
+    write("b = ");
+    write(b);
+    write("\n");
+end;
