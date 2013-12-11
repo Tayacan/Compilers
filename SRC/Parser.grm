@@ -40,7 +40,6 @@ fun opGen con p (e1,e2) = con (e1,e2,p)
 
 %token <AbSyn.Pos> TEOF
 
-%right TId TSemi /* for the sake of Decs */
 %right TIf TElse TThen
 %left TOr
 %left TAnd
@@ -55,7 +54,6 @@ fun opGen con p (e1,e2) = con (e1,e2,p)
 %type <FunDec list> Fundecs
 %type <FunDec> Fundec
 %type <StmtBlock> Block
-%type <Dec list> DBlock
 %type <Stmt list> SBlock
 %type <Stmt list> StmtSeq
 %type <Stmt> Stmt
@@ -87,12 +85,8 @@ Fundec:
 ;
 
 Block:
-    DBlock SBlock { Block($1,$2) }
-;
-
-DBlock:
-    TVar Decs   { $2 }
-  | /* empty */ { [] }
+    TVar Decs SBlock { Block($2,$3) }
+  | SBlock          { Block([],$1) }
 ;
 
 SBlock:
@@ -169,8 +163,8 @@ Dec:
 ;
 
 Decs:
-   Dec TSemi Decs  { $1 :: $3 }
- | Dec TSemi { [$1] }
+    Decs Dec TSemi { $1 @ [$2] } /* ew, append */
+  | Dec TSemi      { [$1] }
 ;
 
 Type:
