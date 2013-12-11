@@ -303,7 +303,7 @@ and callFun ( (rtp : Type option, fid : string, fargs : Dec list, body : StmtBlo
             let val new_vtab = bindTypeIds(fargs, aargs, fid, pdcl, pcall)
                 val res  = execBlock( body, new_vtab, ftab )
             in  ( case (rtp, res) of
-                    (NONE , _ ) => (updateOuterVtable vtab new_vtab (aexps,fargs); NONE)
+                    (NONE , _ ) => (updateOuterVtable vtab new_vtab (aexps,fargs) pcall; NONE)
                     (* Procedure, hence modify this code for TASK 5. *)
 
                   | (SOME t, SOME r) => if   typesEqual(t, typeOfVal r) 
@@ -321,19 +321,20 @@ and callFun ( (rtp : Type option, fid : string, fargs : Dec list, body : StmtBlo
  * result requires that argument expressions are variable names, i.e. expressions like
  * '2 + x' do not work, since '2 * x' is not an LValue variable name.
  *)
-and updateOuterVtable vtabOuter vtabInner (out_exp, in_arg) =
+and updateOuterVtable vtabOuter vtabInner (out_exp, in_arg) pcall =
     let
-        val update_ids = foldl (fn ( (exp, arg_name) ,b) =>
-                                case exp of Var (id, _ ) => (id, arg_name) :: b
-                                       | _     => b
+        val update_ids = foldl (fn ( (exp, argDec) ,b) =>
+                                case (exp,argDec) of
+                                     (LValue(Var (idName, _ ),_),Dec((arg_name,_),_)) => (idName, arg_name) :: b
+                                   | _     => b
                                 ) []  (ListPair.zip (out_exp, in_arg))
         fun read vtab name = case SymTab.lookup name vtab of
                                   SOME a => a
                                 | NONE   => raise Error("Call-by-Value-Result error for "^
-                                                         name^" not existing in the symboltable" )
-        fun assignment (out_name, in_name) = (read vtabOuter out_name := read vtabInner in_name ; ())
+                                                         name^" not existing in the symbol table", pcall )
+        fun assignment (out_name, in_name) = (read vtabOuter out_name := ! (read vtabInner in_name) ; ())
     in
-        app assignment updte_ids ; ()
+        (app assignment update_ids ; ())
     end
 (* Implement this function to complete TASK 5 in the interpreter. *)
 
