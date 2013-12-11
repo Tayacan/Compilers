@@ -444,6 +444,62 @@ struct
         raise Error("variable "^"n"^" with empty index, at ", pos)
 
     | compileLVal( vtab : VTab, Index ((n,t),inds) : LVAL, pos : Pos ) =
+        case SymTab.lookup n vtab of
+          NONE => raise Error ("unknown variable " ^ n, pos)
+        | SOME mdp =>
+        let val metadata_p = mdp
+            val (Array(numOfDims, elem_type)) = t
+            val base = "_base"^newName()
+            val flatIndex = "_flatIndex"^newName()
+
+            (* Generate MIPS-code for checking if an array index is out of bounds *)
+            fun checkIndex index dimSize =
+              let val b = "_legalIndex"^newName()
+              in
+               [ Mips.SLT (b, index, dimSize),
+                 Mips.BEQ (b, "0", "_IllegalArrIndexError_") ]
+              end
+
+            (* We can assume that there are just as many indices as there are
+             * dimensions as this has been checked during typechecking. *)
+            fun calcFIndex ([exp], dim) =
+                  let val index     = "_index"^newName()
+                      val dimSize = "_sizeOfDim"^newName()
+                      val compile_i = compileExp (vtab, exp, index)
+                      val getDimSize = [Mips.LW (dimSize, metadata_p, Int.toString (4*dim))]
+                  in  [Mips.ADDI (flatIndex, "0","0")] @ compile_i @ getDimSize
+                    @ (checkIndex index dimSize)
+                    @ [Mips.ADDI (flatIndex, flatIndex, index)]
+                  end
+              | calcFIndex (exp::exps, dim) =
+                  let val code1 = calcFIndex (exps, dim-1)
+                      val this_index = "_index"^newName()
+                      val dimSize = "_sizeOfDim"^newName()
+                      val compile_i = compileExp (vtab, exp, this_index)
+                      val getDimSize = [Mips.LW (dimSize, metadata_p, Int.toString (4*dim))]
+                      val code2 = [Mips.MUL (flatIndex, flatIndex, dimSize),
+                                   Mips.ADD (flatIndex, flatIndex, this_index)]
+                  in  code1
+                    @ compile_i @ getDimSize @ (checkIndex this_index dimSize)
+                    @ code2
+                  end
+              | calcFIndex _ = raise Fail ("Should not be possible if LVal"^
+                                          "typechecks correctly")
+
+            (* ints are 4 bytes each and bools and chars are just 1 each *)
+            fun byteSizeOf Int = 4
+              | byteSizeOf _   = 1
+            val addr = "_addr"^newName()
+            val bytesz = "_bytesz"^newName() (* kan undgaas *)
+            val calcAddr = [Mips.ADDI (bytesz, "0", Int.toString (byteSizeOf elem_type)),
+                            Mips.LW  (base, metadata_p, Int.toString (4*(numOfDims * 2 - 1))),
+                            Mips.MUL (addr, flatIndex, bytesz),
+                            Mips.ADD (addr, addr, base)]
+
+            val fullcode = calcFIndex (inds, numOfDims) @ calcAddr
+        in
+          (fullcode, Reg addr)
+        end
         (*************************************************************)
         (*** TODO: IMPLEMENT for G-ASSIGNMENT, TASK 4              ***)
         (*** Sugested implementation STEPS:                        ***)
@@ -467,7 +523,6 @@ struct
         (***     Bonus question: can you implement it without      ***)
         (***                        using the stored strides?      ***)
         (*************************************************************)
-        raise Error( "indexed variables UNIMPLEMENTED, at ", pos)
 
 
   (* instr.s for one statement. exitLabel is end (for control flow jumps) *)

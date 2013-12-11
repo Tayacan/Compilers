@@ -9,3 +9,4 @@ Mars4_*.jar
 *.aux
 *.log
 *.toc
+/SRC/.#*
