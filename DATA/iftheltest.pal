@@ -7,6 +7,15 @@ function f(n : int) : int
          then return 0
          else return 1;
 
+function testPrecedence (n : int) : int
+begin
+    if 0 < n
+    then if n < 10
+         then return 10 - n
+         else return n;
+    return 10 * n;
+end;
+
 procedure main ()
 begin
     write ("test 1 expects result -1: ");
@@ -17,5 +26,15 @@ begin
     write ("\n");
     write ("test 3 expects result 1: ");
     write (f(3));
+    write ("\n\n");
+
+    write ("test 4 expects result 6: ");
+    write (testPrecedence (4) );
+    write ("\n");
+    write ("test 5 expects result -40: ");
+    write (testPrecedence (0-4) );
+    write ("\n");
+    write ("test 6 expects result 15: ");
+    write (testPrecedence (15) );
     write ("\n");
 end;
