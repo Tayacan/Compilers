@@ -15,9 +15,13 @@ begin
    c[1] := 'O';
    d[1, 1, 1] := 42;
    d[0, 0, 0] := a[0];
+   write("Test 1 should return 42, and did return: ");
    write(d[1,1,1]);
-   write(a[1]);
-   write(a[2]);
-   write(a[3]);
+   write("\n");
+   write("Test 2 should return 8, and did return: ");
+   write(a[0]);
+   write("\n");
+   write("Test 3 should return 2, and did return: ");
    write(a[4]);
+   write("\n");
 end;

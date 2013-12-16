@@ -208,4 +208,32 @@ The code looks like this:
 
 In an ideal world, type-checking all arguments with integer as the expected type should be enough to ensure that they are all integers, but \texttt{typeCheckExp} only uses the expected type in cases where it's unclear what type an expression should have, such as \texttt{read}-calls. This means that \texttt{typeCheckExp(vtab, somePlusExpression, KnownType(BType Bool))} would not fail, even though a plus expression is always an integer type.
 
+\section{Task 4 - Array indexing}
+\subsection{Type checking}
+Type checking of an array index is simply done by mapping a function that type checks an expression and raises an error if it is not of type \texttt{int} on the list of the given indexes. It also checks that the indexing is full, i.e. the rank of the array equals the length of the list of indexes.
+The added clause to the function \texttt{typeCheckExp} is:
+\begin{lstlisting}
+    | typeCheckExp( vtab, AbSyn.LValue( AbSyn.Index(id, inds), pos ), _ ) =
+       (case SymTab.lookup id vtab of
+          NONE => raise Error("in type check indexed array, id "^id^" not in VTab, at ", pos)
+        | SOME (tp as (Array (rank, e_type))) =>
+          let val new_inds = map (fn exp =>
+            let val new_i = typeCheckExp(vtab, exp, KnownType (BType Int))
+            in  if typesEqual(BType Int, typeOfExp new_i)
+                then new_i
+                else raise Error("in type check one index in indexed array not"^
+                                 "an int-expression, at ", pos)
+            end inds
+          in
+            if rank > 0 andalso rank = length inds
+            then LValue(Index((id, tp), new_inds), pos)
+            else raise Error("in type check indexed array full indexing "^
+                             "expected, at ", pos)
+          end
+        | _ => raise Error("Type check error: can only index "^
+                           "into arrays, at ", pos)
+       )
+\end{lstlisting}
+\subsection{Code generation}
+
 \end{document}
