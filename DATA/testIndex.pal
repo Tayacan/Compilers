@@ -15,4 +15,9 @@ begin
    c[1] := 'O';
    d[1, 1, 1] := 42;
    d[0, 0, 0] := a[0];
+   write(d[1,1,1]);
+   write(a[1]);
+   write(a[2]);
+   write(a[3]);
+   write(a[4]);
 end;
