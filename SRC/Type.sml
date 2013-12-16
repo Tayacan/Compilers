@@ -157,6 +157,24 @@ struct
         )
 
     | typeCheckExp( vtab, AbSyn.LValue( AbSyn.Index(id, inds), pos ), _ ) =
+       (case SymTab.lookup id vtab of
+          NONE => raise Error("in type check indexed array, id "^id^" not in VTab, at ", pos)
+        | SOME (tp as (Array (rank, e_type))) =>
+          let val new_inds = map (fn exp =>
+                                    let val new_i = typeCheckExp(vtab, exp, KnownType (BType Int))
+                                    in  if typesEqual(BType Int, typeOfExp new_i)
+                                        then new_i
+                                        else raise Error("in type check one index in indexed array not"^
+                                                         "an int-expression, at ", pos)
+                                    end)
+                             inds
+          in
+            if rank > 0 andalso rank = length inds
+            then LValue(Index((id, tp), new_inds), pos)
+            else raise Error("in type check indexed array full indexing expected, at ", pos)
+          end
+        | _ => raise Error("Type check error: can only index into arrays, at ", pos)
+       )
         (*************************************************************)
         (*** TO DO: IMPLEMENT for G-ASSIGNMENT, TASK 4             ***)
         (*** Suggested implementation STEPS:                       ***)
@@ -172,7 +190,6 @@ struct
         (***         LValue( Index ((id, id_tp), new_inds), pos )  ***)
         (***       where `new_inds' are the typed version of `inds'***)
         (*************************************************************)
-        raise Error( "in type check, indexed expression UNIMPLEMENTED, at ", pos)
 
       (* Must be modified to complete task 3 *)
     | typeCheckExp( vtab, AbSyn.Plus (e1, e2, pos), _ ) =

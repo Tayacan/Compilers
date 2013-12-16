@@ -443,13 +443,11 @@ struct
     | compileLVal( vtab : VTab, Index ((n,_),  []) : LVAL, pos : Pos ) =
         raise Error("variable "^"n"^" with empty index, at ", pos)
 
-    | compileLVal( vtab : VTab, Index ((n,t),inds) : LVAL, pos : Pos ) =
-        case SymTab.lookup n vtab of
+    | compileLVal( vtab : VTab, Index ((n, Array(rank, elem_type)),inds) : LVAL, pos : Pos ) =
+        (case SymTab.lookup n vtab of
           NONE => raise Error ("unknown variable " ^ n, pos)
-        | SOME mdp =>
-        let val metadata_p = mdp
-            val (Array(numOfDims, elem_type)) = t
-            val base = "_base"^newName()
+        | SOME metadata_p =>
+        let val base = "_base"^newName()
             val flatIndex = "_flatIndex"^newName()
 
             (* Generate MIPS-code for checking if an array index is out of bounds *)
@@ -469,7 +467,7 @@ struct
                       val getDimSize = [Mips.LW (dimSize, metadata_p, Int.toString (4*dim))]
                   in  [Mips.ADDI (flatIndex, "0","0")] @ compile_i @ getDimSize
                     @ (checkIndex index dimSize)
-                    @ [Mips.ADDI (flatIndex, flatIndex, index)]
+                    @ [Mips.ADD (flatIndex, flatIndex, index)]
                   end
               | calcFIndex (exp::exps, dim) =
                   let val code1 = calcFIndex (exps, dim-1)
@@ -492,14 +490,15 @@ struct
             val addr = "_addr"^newName()
             val bytesz = "_bytesz"^newName() (* kan undgaas *)
             val calcAddr = [Mips.ADDI (bytesz, "0", Int.toString (byteSizeOf elem_type)),
-                            Mips.LW  (base, metadata_p, Int.toString (4*(numOfDims * 2 - 1))),
+                            Mips.LW  (base, metadata_p, Int.toString (4*(rank * 2 - 1))),
                             Mips.MUL (addr, flatIndex, bytesz),
                             Mips.ADD (addr, addr, base)]
 
-            val fullcode = calcFIndex (inds, numOfDims) @ calcAddr
+            val fullcode = calcFIndex (inds, rank) @ calcAddr
         in
           (fullcode, Reg addr)
-        end
+        end)
+    | compileLVal _ = raise Fail "impossible"
         (*************************************************************)
         (*** TODO: IMPLEMENT for G-ASSIGNMENT, TASK 4              ***)
         (*** Sugested implementation STEPS:                        ***)
