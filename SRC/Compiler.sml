@@ -508,16 +508,14 @@ struct
               | calcFIndex _ = raise Fail ("Should not be possible if LVal"^
                                           "typechecks correctly")
 
-            val bytesz = "_bytesz"^newName()
             val addr = "_addr"^newName()
             (* ints are 4 bytes each and bools and chars are just 1 each *)
             val calcAddr = case elem_type of
-                             Int => [Mips.ADDI (bytesz, "0", "4"),
-                                     Mips.LW  (base, metadata_p, Int.toString (4*(rank * 2 - 1))),
-                                     Mips.MUL (addr, flatIndex, bytesz),
+                             Int => [Mips.LW  (base, metadata_p, Int.toString (4*(rank * 2 - 1))),
+                                     Mips.SLL (addr, flatIndex, "2"),
                                      Mips.ADD (addr, addr, base)]
                            | _   => [Mips.LW  (base, metadata_p, Int.toString (4*(rank * 2 - 1))),
-                                     Mips.ADD (addr, addr, base)]
+                                     Mips.ADD (addr, flatIndex, base)]
             val fullcode = calcFIndex (inds, rank) @ calcAddr
         in
           (fullcode, Mem addr)

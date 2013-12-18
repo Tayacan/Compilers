@@ -9,12 +9,12 @@ var i : int;
 begin
    a := new (4,4,4);
    i := 0;
-   j := 0;
-   k := 0;
    while (i < 4) do
      begin
+       j := 0;
        while (j < 4) do
          begin
+           k := 0;
            while (k < 4) do
              begin
                a[i,j,k] :=  i + j + k;
@@ -24,10 +24,13 @@ begin
          end;
        i := i + 1;
      end;
+   write ("Test 1 returns: ");
    write (a[2,3,1]);
-   write ("lig 6\n");
+   write (", and should return: 6\n");
+   write ("Test 2 returns: ");
    write (a[1,1,1]);
-   write ("lig 3\n");
+   write (", and should return: 3\n");
+   write ("Test 3 returns: ");
    write (a[3,3,1]);
-   write ("lig 7\n");
+   write (", and should return: 7\n");
 end;
