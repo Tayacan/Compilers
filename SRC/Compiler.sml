@@ -257,11 +257,11 @@ struct
             val c1 = compileExp(vtable, e1, t1)
             val t2 = "or2_" ^ newName()
             val c2 = compileExp(vtable, e2, t2)
-            val lA = "_or_" ^ newName()
+            val lO = "_or_" ^ newName()
         in c1 (* do first part, skip 2nd part if already true *)
-           @ [Mips.MOVE (place,t1), Mips.BEQ (place, "1", lA) ]
+           @ [Mips.MOVE (place,t1), Mips.BNE (place, "0", lO) ]
            @ c2 (* when here, t1 was  false, so the result is t2 *)
-           @ [Mips.MOVE (place,t2), Mips.LABEL lA ]
+           @ [Mips.MOVE (place,t2), Mips.LABEL lO ]
         end
 
     | compileExp( vtable, Not(e1, pos), place ) =
@@ -453,9 +453,12 @@ struct
             (* Generate MIPS-code for checking if an array index is out of bounds *)
             fun checkIndex index dimSize =
               let val b = "_legalIndex"^newName()
+                  val tmp = "_tmp"^newName()
               in
                [ Mips.SLT (b, index, dimSize),
-                 Mips.BEQ (b, "0", "_IllegalArrIndexError_") ]
+                 Mips.SLT (tmp, index, "0"),
+                 Mips.BEQ (b, "0", "_IllegalArrIndexError_"),
+                 Mips.BNE (tmp, "0", "_IllegalArrIndexError_") ]
               end
 
             (* We can assume that there are just as many indices as there are
@@ -473,8 +476,7 @@ struct
                   let val code1 = calcFIndex (exps, dim-1)
                       val this_index = "_index"^newName()
                       val dimSize = "_sizeOfDim"^newName()
-                      val compile_i = compileExp (vtab, exp, this_index) @
-                                      [Mips.ADDI (this_index, this_index, "-1")]
+                      val compile_i = compileExp (vtab, exp, this_index)
                       val getDimSize = [Mips.LW (dimSize, metadata_p, Int.toString (4*(dim-1)))]
                       val code2 = [Mips.MUL (flatIndex, flatIndex, dimSize),
                                    Mips.ADD (flatIndex, flatIndex, this_index)]
@@ -485,16 +487,16 @@ struct
               | calcFIndex _ = raise Fail ("Should not be possible if LVal"^
                                           "typechecks correctly")
 
-            (* ints are 4 bytes each and bools and chars are just 1 each *)
-            fun byteSizeOf Int = 4
-              | byteSizeOf _   = 1
+            val bytesz = "_bytesz"^newName()
             val addr = "_addr"^newName()
-            val bytesz = "_bytesz"^newName() (* kan undgaas *)
-            val calcAddr = [Mips.ADDI (bytesz, "0", Int.toString (byteSizeOf elem_type)),
-                            Mips.LW  (base, metadata_p, Int.toString (4*(rank * 2 - 1))),
-                            Mips.MUL (addr, flatIndex, bytesz),
-                            Mips.ADD (addr, addr, base)]
-
+            (* ints are 4 bytes each and bools and chars are just 1 each *)
+            val calcAddr = case elem_type of
+                             Int => [Mips.ADDI (bytesz, "0", "4"),
+                                     Mips.LW  (base, metadata_p, Int.toString (4*(rank * 2 - 1))),
+                                     Mips.MUL (addr, flatIndex, bytesz),
+                                     Mips.ADD (addr, addr, base)]
+                           | _   => [Mips.LW  (base, metadata_p, Int.toString (4*(rank * 2 - 1))),
+                                     Mips.ADD (addr, addr, base)]
             val fullcode = calcFIndex (inds, rank) @ calcAddr
         in
           (fullcode, Mem addr)
