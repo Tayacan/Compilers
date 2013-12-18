@@ -4,6 +4,23 @@
 \usepackage{color}
 \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
 
+\lstdefinelanguage{Paladim}{
+    morekeywords={program, function, procedure, var, begin, end, if, then, else, while},
+    morekeywords={do, return, array, of, int, bool, char, and,  or, not, true, false},
+    morecomment=[l]{//},
+    morestring=[bd]',
+    morestring=[bd]",
+    sensitive=true,
+}
+
+\lstdefinelanguage{MIPS}{
+    morekeywords={addi, add, sw, lw, j, beq, bne, slt, subi, sub, div, and, andi, or, ori},
+    morecomment=[l]{\#},
+    morestring=[bd]',
+    morestring=[bd]",
+    sensitive=false,
+}
+
 \lstdefinelanguage{SML}{
     morekeywords={ if, val, fun, let, in, end, then, else, andalso, orelse },
     morecomment=[s]{(*}{*)},
