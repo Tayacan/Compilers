@@ -1,0 +1,10 @@
+program arrays;
+
+procedure main()
+var a : array of array of int;
+begin
+    a := new(2,3);
+    a[2,1] := 2; write("a[2,1]\n");
+    a[1,2] := 1; write("a[1,2]\n");
+end;
+
