@@ -36,7 +36,8 @@ begin
     write("Char array is: \n");
     printArr(a);
     write("Bool array is: \n");
-    printArr(b);
+    //printArr(b);
+    write("printArr cant print a bool array...\n");
 end;
 
 

@@ -192,5 +192,5 @@ end;
 // Glide, puny being!
 procedure main()
 begin
-   game(10, 16, 100);
+   game(10, 16, 1000);
 end;

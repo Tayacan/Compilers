@@ -22,7 +22,7 @@ var
    a : char;
    ret : char;
 begin
-   a := readChar();
+   a := read();
    nextChar(a, ret);
    write(a);
    write('\n');
