@@ -262,12 +262,18 @@ The added clause to the function \texttt{typeCheckExp} is:
        )
 \end{lstlisting}
 \subsection{Code generation}
+The purpose of the machine code generated here is to calculate the address of a specific array element given the index (indices, if the array is multi-dimensional), the type of the elements and some metadata stored in the memory. At this point the array indexing has type-checked, so we can assume that the indexing is full and that all indices are actual integers. The calculation of the address will be performed in these steps:
+\begin{enumerate}
+  \item Firstly, we calculate the flat index.
+  \item Then we find the base of the array, which is the last element in the metadata of the array.
+  \item Finally, we add the flat index (multiplied by the byte-size of the type of the array elements, e.g. 4 for an int-array) and the base together to get the final address.
+\end{enumerate}
 
 \section{Call-by-value-result semantics for procedures}
 To implement call-by-value-result semantics, a slightly different procedure was necessary
 for the interpreter and the compiler. 
 
-\subsection{Interpreter}
+\subsection{Interpretation of procedures}
 In the interpreter the use of the SML references,
 which are stored in the symbol table, allows for direct manipulation of the outer symbol table from inside the called function.
 This is done by passing the old symbol table along as a parameter to callFun, which would use a copied symbol table for its inner statements.
@@ -276,15 +282,26 @@ While it did require some pattern matching, to check the type of the expression,
 from the symbol tables, it was relatively straigtforward.
 % inner
 \subsection{Compilation of procedures}
-The generated code starts by moving the bound parameters into temporary registers. Our addition to the code
+For the compiler, it was necessary to both change code for the caller and the callee.
+The reason being, that the data is both copied into special transition registers by the caller and out of them by the callee.
+The generated code of the callee starts by moving the bound parameters into transition registers. Our addition to the code
 does exactly the opposite. After the code that makes up the body of the procedure, we add Mips.MOVE-instructions
 to move the values, not from \texttt{reg} to \texttt{vname}, but from \texttt{vname} to \texttt{reg}.
 
 We have added our code to the list of instructions given to the register allocater, because it uses the same
 registers as \texttt{argcode} -- When the symbolic registers in \texttt{argcode} are assigned, we want it to
 use the same registers for moving the other way.
-
 % outer
+\\
+For the caller, we use that the constuctor for the code that allocates data to the transition registers,
+and simply let it construct an equivalent piece of code for each part that moves them back.
+This is however not completely trivial, since those sources themselves are actually temporary registers
+for the results of calculated the expressions. So instead, we check to see if each expression is equivalent
+to a single identifier, for which we then look up the register for that expression in the symbol table,
+and use that, and if an expresions is not on that form, we simply do not add any code to move such a register back.
+Since this code needs to be put after the function call, then the constructer returns this move back code as a seperate
+return value (of the now triple turple), and that code is then appended to code for calling the procedure
+(meaning after the jump to the procedure).
 
 \newpage
 \begin{appendix}

@@ -469,16 +469,17 @@ struct
         | SOME metadata_p =>
         let val base = "_base"^newName()
             val flatIndex = "_flatIndex"^newName()
+            val addr = "_addr"^newName()
 
             (* Generate MIPS-code for checking if an array index is out of bounds *)
             fun checkIndex index dimSize =
-              let val b = "_legalIndex"^newName()
-                  val tmp = "_tmp"^newName()
+              let val b1 = "_legalIndex"^newName()
+                  val b2 = "_tmp"^newName()
               in
-               [ Mips.SLT (b, index, dimSize),
-                 Mips.SLT (tmp, index, "0"),
-                 Mips.BEQ (b, "0", "_IllegalArrIndexError_"),
-                 Mips.BNE (tmp, "0", "_IllegalArrIndexError_") ]
+               [ Mips.SLT (b1, index, dimSize),
+                 Mips.SLT (b2, index, "0"),
+                 Mips.BEQ (b1, "0", "_IllegalArrIndexError_"),
+                 Mips.BNE (b2, "0", "_IllegalArrIndexError_") ]
               end
 
             (* We can assume that there are just as many indices as there are
@@ -508,7 +509,6 @@ struct
               | calcFIndex _ = raise Fail ("Should not be possible if LVal"^
                                           "typechecks correctly")
 
-            val addr = "_addr"^newName()
             (* ints are 4 bytes each and bools and chars are just 1 each *)
             val calcAddr = case elem_type of
                              Int => [Mips.LW  (base, metadata_p, Int.toString (4*(rank * 2 - 1))),
