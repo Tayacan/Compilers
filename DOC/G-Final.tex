@@ -255,6 +255,15 @@ The added clause to the function \texttt{typeCheckExp} is:
 \subsection{Code generation}
 
 \section{Call-by-value-result semantics for procedures}
+To implement call-by-value-result semeantics, a slightly different procedure was necessary
+for the interpreter and the compiler. 
+\subsection{Interpreter}
+In the interpreter, the use of the SML references,
+which is stored in the symbol table, allowed for dirrect manipulation of the outer symbol table inside the called function,
+since the old symbol table was parsed allong as a parameter to callFun, which would use a copied symbol table for its inner statements.
+This allowed us to simply update the references for those expressions, which we could identify as simply being a single identifier.
+While it did require some pattern matching, to check the correct type of expression, and extracting informatin the right way
+from the symbol tables, it was relatively straitforward.
 % inner
 
 % outer
