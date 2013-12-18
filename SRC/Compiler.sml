@@ -440,10 +440,10 @@ struct
           val t1 = "_funarg_"^newName()
           val code1 = compileExp(vtable, e, t1)
           val target = case e of
-	                    LValue(Var (idName,_)) => SymTab.lookup idName vtable
+	                    LValue(Var (idName,_),_) => SymTab.lookup idName vtable
 			  | _                      => NONE
           val codeRe = case target of
-                            SOME tReg => [Mips.Move (tReg, makeConst reg)]
+                            SOME tReg => [Mips.MOVE (tReg, makeConst reg)]
                          |  NONE      => []
           val (code2, codeRe2, maxreg) = moveArgs es vtable (reg+1)
       in
