@@ -433,6 +433,26 @@ struct
       end
 (** TASK 5: You may want to create a function slightly similar to putArgs,
  *  but instead moving args back to registers. **)
+  and moveArgs [] vtable reg =
+        ([], reg)
+    | moveArgs (e::es) vtable reg =
+      let
+          val t1 = "_funarg_"^newName()
+          val code1 = compileExp(vtable, e, t1)
+          val target = case e of
+	                    LValue(Var (idName,_)) => SymTab.lookup idName vtable
+			  | _                      => NONE
+          val codeRe = case target of
+                            SOME tReg => [Mips.Move (tReg, makeConst reg)]
+                         |  NONE      => []
+          val (code2, codeRe2, maxreg) = moveArgs es vtable (reg+1)
+      in
+          (   code1                          (* compute arg1 *)
+            @ code2                          (* compute rest *)
+            @ [Mips.MOVE (makeConst reg,t1)] (* store in reg *)
+	    , codeRe @ codeRe2
+            , maxreg)
+      end
 
 
   and compileLVal( vtab : VTab, Var (n,_) : LVAL, pos : Pos ) : Mips.mips list * Location =
@@ -524,9 +544,9 @@ struct
          * the procedure. **)
         | ProcCall ((n,_), es, p) => 
           let
-              val (mvcode, maxreg) = putArgs es vtable minReg
+              val (mvcode, rmcode ,maxreg) = putArgs es vtable minReg
           in
-              mvcode @ [Mips.JAL (n, List.tabulate (maxreg, fn reg => makeConst reg))]
+              mvcode @ [Mips.JAL (n, List.tabulate (maxreg, fn reg => makeConst reg))] @ rmcode
           end
         | Assign (lv, e, p) =>
           let val (codeL,loc) = compileLVal(vtable, lv, p)
