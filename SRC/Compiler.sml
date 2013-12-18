@@ -630,13 +630,16 @@ struct
                                      ^")", pos)
           val (movePairs, vtable) = getMovePairs args [] minReg
           val argcode = map (fn (vname, reg) => Mips.MOVE (vname, reg)) movePairs
+          val mvargs = if isProc
+                       then map (fn (vname, reg) => Mips.MOVE(reg,vname)) movePairs
+                       else []
           (** TASK 5: You need to add code to move variables back into callee registers,
            * i.e. something similar to 'argcode', just the other way round.  Use the
            * value of 'isProc' to determine whether you are dealing with a function
            * or a procedure. **)
           val body = compileStmts block vtable (fname ^ "_exit")
           val (body1, _, maxr, spilled) =  (* call register allocator *)
-              RegAlloc.registerAlloc ( argcode @ body )
+              RegAlloc.registerAlloc ( argcode @ body @ mvargs )
                                      ["2"] minReg maxCaller maxReg 0
                                      (* 2 contains return val*)
           val (savecode, restorecode, offset) = (* save/restore callee-saves *)
