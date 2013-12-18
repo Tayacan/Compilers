@@ -31,6 +31,7 @@
 \author{Ask Neve Gamby, Maya Saietz \& Christian Haase}
 
 \begin{document}
+\tableofcontents
 \maketitle
 \newpage
 \section{Parser implementation}
@@ -208,7 +209,7 @@ The code looks like this:
 
 In an ideal world, type-checking all arguments with integer as the expected type should be enough to ensure that they are all integers, but \texttt{typeCheckExp} only uses the expected type in cases where it's unclear what type an expression should have, such as \texttt{read}-calls. This means that \texttt{typeCheckExp(vtab, somePlusExpression, KnownType(BType Bool))} would not fail, even though a plus expression is always an integer type.
 
-\section{Task 4 - Array indexing}
+\section{Array indexing}
 \subsection{Type checking}
 Type checking of an array index is simply done by mapping a function that type checks an expression and raises an error if it is not of type \texttt{int} on the list of the given indexes. It also checks that the indexing is full, i.e. the rank of the array equals the length of the list of indexes.
 The added clause to the function \texttt{typeCheckExp} is:
@@ -235,5 +236,10 @@ The added clause to the function \texttt{typeCheckExp} is:
        )
 \end{lstlisting}
 \subsection{Code generation}
+
+\section{Call-by-value-result semantics for procedures}
+% inner
+
+% outer
 
 \end{document}
