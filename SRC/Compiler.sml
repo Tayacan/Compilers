@@ -516,7 +516,7 @@ struct
                                      Mips.ADD (addr, addr, base)]
                            | _   => [Mips.LW  (base, metadata_p, Int.toString (4*(rank * 2 - 1))),
                                      Mips.ADD (addr, flatIndex, base)]
-            val fullcode = calcFIndex (inds, rank) @ calcAddr
+            val fullcode = calcFIndex (rev inds, rank) @ calcAddr
         in
           (fullcode, Mem addr)
         end)
