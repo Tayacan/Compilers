@@ -253,6 +253,12 @@ The added clause to the function \texttt{typeCheckExp} is:
        )
 \end{lstlisting}
 \subsection{Code generation}
+The purpose of the machine code generated here is to calculate the address of a specific array element given the index (indices, if the array is multi-dimensional), the type of the elements and some metadata stored in the memory. At this point the array indexing has type-checked, so we can assume that the indexing is full and that all indices are actual integers. The calculation of the address will be performed in these steps:
+\begin{enumerate}
+  \item Firstly, we calculate the flat index.
+  \item Then we find the base of the array, which is the last element in the metadata of the array.
+  \item Finally, we add the flat index (multiplied by the byte-size of the type of the array elements, e.g. 4 for an int-array) and the base together to get the final address.
+\end{enumerate}
 
 \section{Call-by-value-result semantics for procedures}
 To implement call-by-value-result semeantics, a slightly different procedure was necessary
