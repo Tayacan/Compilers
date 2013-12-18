@@ -470,11 +470,12 @@ struct
                     @ [Mips.ADD (flatIndex, flatIndex, index)]
                   end
               | calcFIndex (exp::exps, dim) =
-                  let val code1 = calcFIndex (exps, dim-1)
+                  let val code1 = calcFIndex (exps, dim-1) (* calcFIndex ([0],1) *)
                       val this_index = "_index"^newName()
                       val dimSize = "_sizeOfDim"^newName()
-                      val compile_i = compileExp (vtab, exp, this_index) @
-                                      [Mips.ADDI (this_index, this_index, "-1")]
+                      val compile_i = compileExp (vtab, exp, this_index) (*@
+                                      [Mips.ADDI (this_index, this_index,
+                                      "-1")]*)
                       val getDimSize = [Mips.LW (dimSize, metadata_p, Int.toString (4*(dim-1)))]
                       val code2 = [Mips.MUL (flatIndex, flatIndex, dimSize),
                                    Mips.ADD (flatIndex, flatIndex, this_index)]
@@ -495,7 +496,7 @@ struct
                             Mips.MUL (addr, flatIndex, bytesz),
                             Mips.ADD (addr, addr, base)]
 
-            val fullcode = calcFIndex (inds, rank) @ calcAddr
+            val fullcode = calcFIndex (rev inds, rank) @ calcAddr
         in
           (fullcode, Mem addr)
         end)
