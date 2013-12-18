@@ -1,0 +1,33 @@
+program multidimensionalarray;
+
+procedure main()
+var i : int;
+    j : int;
+    k : int;
+    a : array of array of array of int;
+
+begin
+   a := new (4,4,4);
+   i := 0;
+   j := 0;
+   k := 0;
+   while (i < 3) do
+     begin
+       while (j < 3) do
+         begin
+           while (k < 3) do
+             begin
+               a[i,j,k] :=  i + j + k;
+               k := k + 1;
+             end;
+           j := j + 1;
+         end;
+       i := i + 1;
+     end;
+   write (a[2,3,1]);
+   write ("lig 6\n");
+   write (a[1,1,1]);
+   write ("lig 3\n");
+   write (a[3,3,1]);
+   write ("lig 7\n");
+end;
