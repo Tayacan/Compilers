@@ -256,6 +256,14 @@ The added clause to the function \texttt{typeCheckExp} is:
 
 \section{Call-by-value-result semantics for procedures}
 % inner
+\subsection{Compilation of procedures}
+The generated code starts by moving the bound parameters into temporary registers. Our addition to the code
+does exactly the opposite. After the code that makes up the body of the procedure, we add Mips.MOVE-instructions
+to move the values, not from \texttt{reg} to \texttt{vname}, but from \texttt{vname} to \texttt{reg}.
+
+We have added our code to the list of instructions given to the register allocater, because it uses the same
+registers as \texttt{argcode} -- When the symbolic registers in \texttt{argcode} are assigned, we want it to
+use the same registers for moving the other way.
 
 % outer
 
