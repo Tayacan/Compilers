@@ -110,7 +110,7 @@ struct
         let val normalChars =
                     (List.filter Char.isAlphaNum (String.explode(strlit)))
                   @ String.explode "__str__"
-            val label = String.implode(List.take (normalChars,7)) ^ newName()
+            val label = "s" ^ String.implode(List.take (normalChars,7)) ^ newName()
             val ()    = stringTable := (label,strlit)::(!stringTable)
         in  [ Mips.LA (place, label),
               Mips.COMMENT (label^": string \""^ String.toCString strlit ^ "\"") ]
@@ -259,7 +259,7 @@ struct
             val c2 = compileExp(vtable, e2, t2)
             val lA = "_or_" ^ newName()
         in c1 (* do first part, skip 2nd part if already true *)
-           @ [Mips.MOVE (place,t1), Mips.BEQ (place, "1", lA) ]
+           @ [Mips.MOVE (place,t1), Mips.BNE (place, "0", lA) ]
            @ c2 (* when here, t1 was  false, so the result is t2 *)
            @ [Mips.MOVE (place,t2), Mips.LABEL lA ]
         end
