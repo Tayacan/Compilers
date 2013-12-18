@@ -434,7 +434,7 @@ struct
 (** TASK 5: You may want to create a function slightly similar to putArgs,
  *  but instead moving args back to registers. **)
   and moveArgs [] vtable reg =
-        ([], reg)
+        ([], [], reg)
     | moveArgs (e::es) vtable reg =
       let
           val t1 = "_funarg_"^newName()
@@ -544,7 +544,7 @@ struct
          * the procedure. **)
         | ProcCall ((n,_), es, p) => 
           let
-              val (mvcode, rmcode ,maxreg) = putArgs es vtable minReg
+              val (mvcode, rmcode ,maxreg) = moveArgs es vtable minReg
           in
               mvcode @ [Mips.JAL (n, List.tabulate (maxreg, fn reg => makeConst reg))] @ rmcode
           end
