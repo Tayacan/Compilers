@@ -3,7 +3,8 @@ program regs;
 // This function uses all available registers (forced by read() calls).
 // Uses maximum number of arguments, and regs 16-24 for intermediate
 // values. Computed result is the sum of all arguments.
-function eatregs(r2 : int;
+function eatregs(
+                 r2 : int;
                  r3 : int;
                  r4 : int;
                  r5 : int;
@@ -42,7 +43,8 @@ begin
 end;
 
 // Computed result is again the sum of all arguments.
-function eatregs2(r2 : int;
+function eatregs2(r1 : int;
+                 r2 : int;
                  r3 : int;
                  r4 : int;
                  r5 : int;
@@ -93,11 +95,11 @@ begin
    write ("Enter a natural number, expect 10* your number afterwards: ");
    x := read();
 
-   y := eatregs(x, x, x, x, x, x, x, x, x, x, x, x, x, x, x);
+   y := eatregs(x, x, x, x, x, x, x, x, x, x, x, x, x, x);
    write(y);
    write('\n');
 
-   y := eatregs2(x, x, x, x, x, x, x, x, x, x);
+   y := eatregs2(x, x, x, x, x, x, x, x, x, x, x);
    write(y);
    write('\n');
 
@@ -113,7 +115,8 @@ begin
                  x-eatregs2(y, y, y, y, y, y, y, y, y, y, y),
                  eatregs2(y, y, y, y, y, y, y, y, y, y, y)-x,
                  x-eatregs2(y, y, y, y, y, y, y, y, y, y, y),
-                 eatregs2(y, y, y, y, y, y, y, y, y, y, y)-x);
+                 eatregs2(y, y, y, y, y, y, y, y, y, y, y)-x,
+                 x-eatregs2(y, y, y, y, y, y, y, y, y, y, y));
    write(y);
    write('\n');
 end;

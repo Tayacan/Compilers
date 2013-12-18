@@ -7,8 +7,8 @@ var
    m : int;
    n : int;
 begin
-   m := readInt();
-   n := readInt();
+   m := read();
+   n := read();
    writeMN(m, n);
 
    swap(m, n);
