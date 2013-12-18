@@ -28,6 +28,15 @@
     morestring=[bd]",
     sensitive=false,
 }
+
+\lstdefinelanguage{Yacc}{
+    morekeywords={ if, val, fun, let, in, end, then, else, andalso, orelse },
+    morecomment=[s]{(*}{*)},
+    morestring=[bd]',
+    morestring=[bd]",
+    sensitive=false,
+}
+
 \lstset{
     breaklines     = true,
     numbers        = left,
@@ -277,4 +286,18 @@ use the same registers for moving the other way.
 
 % outer
 
+\newpage
+\begin{appendix}
+\section{Source code}
+\subsection{Parser.grm}
+    \lstinputlisting[language=Yacc]{../SRC/Parser.grm}
+\subsection{ParserTest.sml}
+    \lstinputlisting[language=SML]{../SRC/ParserTest.sml}
+\subsection{Compiler.sml}
+    \lstinputlisting[language=SML]{../SRC/Compiler.sml}
+\subsection{Type.sml}
+    \lstinputlisting[language=SML]{../SRC/Type.sml}
+\subsection{TpInterpret.sml}
+    \lstinputlisting[language=SML]{../SRC/TpInterpret.sml}
+\end{appendix}
 \end{document}
