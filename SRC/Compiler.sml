@@ -110,7 +110,7 @@ struct
         let val normalChars =
                     (List.filter Char.isAlphaNum (String.explode(strlit)))
                   @ String.explode "__str__"
-            val label = String.implode(List.take (normalChars,7)) ^ newName()
+            val label = "s" ^ String.implode(List.take (normalChars,7)) ^ newName()
             val ()    = stringTable := (label,strlit)::(!stringTable)
         in  [ Mips.LA (place, label),
               Mips.COMMENT (label^": string \""^ String.toCString strlit ^ "\"") ]
@@ -433,6 +433,26 @@ struct
       end
 (** TASK 5: You may want to create a function slightly similar to putArgs,
  *  but instead moving args back to registers. **)
+  and moveArgs [] vtable reg =
+        ([], [], reg)
+    | moveArgs (e::es) vtable reg =
+      let
+          val t1 = "_funarg_"^newName()
+          val code1 = compileExp(vtable, e, t1)
+          val target = case e of
+	                    LValue(Var (idName,_),_) => SymTab.lookup idName vtable
+			  | _                      => NONE
+          val codeRe = case target of
+                            SOME tReg => [Mips.MOVE (tReg, makeConst reg)]
+                         |  NONE      => []
+          val (code2, codeRe2, maxreg) = moveArgs es vtable (reg+1)
+      in
+          (   code1                          (* compute arg1 *)
+            @ code2                          (* compute rest *)
+            @ [Mips.MOVE (makeConst reg,t1)] (* store in reg *)
+	    , codeRe @ codeRe2
+            , maxreg)
+      end
 
 
   and compileLVal( vtab : VTab, Var (n,_) : LVAL, pos : Pos ) : Mips.mips list * Location =
@@ -473,10 +493,11 @@ struct
                     @ [Mips.ADD (flatIndex, flatIndex, index)]
                   end
               | calcFIndex (exp::exps, dim) =
-                  let val code1 = calcFIndex (exps, dim-1)
+                  let val code1 = calcFIndex (exps, dim-1) (* calcFIndex ([0],1) *)
                       val this_index = "_index"^newName()
                       val dimSize = "_sizeOfDim"^newName()
                       val compile_i = compileExp (vtab, exp, this_index)
+
                       val getDimSize = [Mips.LW (dimSize, metadata_p, Int.toString (4*(dim-1)))]
                       val code2 = [Mips.MUL (flatIndex, flatIndex, dimSize),
                                    Mips.ADD (flatIndex, flatIndex, this_index)]
@@ -581,9 +602,9 @@ struct
          * the procedure. **)
         | ProcCall ((n,_), es, p) => 
           let
-              val (mvcode, maxreg) = putArgs es vtable minReg
+              val (mvcode, rmcode ,maxreg) = moveArgs es vtable minReg
           in
-              mvcode @ [Mips.JAL (n, List.tabulate (maxreg, fn reg => makeConst reg))]
+              mvcode @ [Mips.JAL (n, List.tabulate (maxreg, fn reg => makeConst reg))] @ rmcode
           end
         | Assign (lv, e, p) =>
           let val (codeL,loc) = compileLVal(vtable, lv, p)
@@ -667,13 +688,16 @@ struct
                                      ^")", pos)
           val (movePairs, vtable) = getMovePairs args [] minReg
           val argcode = map (fn (vname, reg) => Mips.MOVE (vname, reg)) movePairs
+          val mvargs = if isProc
+                       then map (fn (vname, reg) => Mips.MOVE(reg,vname)) movePairs
+                       else []
           (** TASK 5: You need to add code to move variables back into callee registers,
            * i.e. something similar to 'argcode', just the other way round.  Use the
            * value of 'isProc' to determine whether you are dealing with a function
            * or a procedure. **)
           val body = compileStmts block vtable (fname ^ "_exit")
           val (body1, _, maxr, spilled) =  (* call register allocator *)
-              RegAlloc.registerAlloc ( argcode @ body )
+              RegAlloc.registerAlloc ( argcode @ body @ mvargs )
                                      ["2"] minReg maxCaller maxReg 0
                                      (* 2 contains return val*)
           val (savecode, restorecode, offset) = (* save/restore callee-saves *)

@@ -11,11 +11,11 @@ begin
    i := 0;
    j := 0;
    k := 0;
-   while (i < 3) do
+   while (i < 4) do
      begin
-       while (j < 3) do
+       while (j < 4) do
          begin
-           while (k < 3) do
+           while (k < 4) do
              begin
                a[i,j,k] :=  i + j + k;
                k := k + 1;
