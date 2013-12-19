@@ -3,6 +3,6 @@ procedure main ()
 var arr : array of int;
 begin
     arr := {1, 2, 3};
-    write(arr[10]);
+    write(arr[1]);
     write("\n");
 end;

@@ -11,8 +11,8 @@ cd $(dirname "$0")
 rm -f SymTab.u*
 rm -f Lexer.sml Lexer.u*
 rm -f Parser.u*
-rm -f Absyn.u*
-rm -f TpAbsyn.u*
+rm -f AbSyn.u*
+rm -f TpAbSyn.u*
 rm -f Type.u*
 rm -f LL1Lexer.u*
 rm -f LL1Parser.u*
