@@ -268,13 +268,114 @@ The purpose of the machine code generated here is to calculate the address of a 
   \item Then we find the base of the array, which is the last element in the metadata of the array.
   \item Finally, we add the flat index (multiplied by the byte-size of the type of the array elements, e.g. 4 for an int-array) and the base together to get the final address.
 \end{enumerate}
-Calculating the flat index we have not used the strides as this is not neccessary. To explain the method let's look at an example with a four dimensional array where the $k$'th dimension has the size $d_k$. The flat index $i_flat$ for the array position \texttt{a[i_1,i_2,i_3,i_4]} is
+Calculating the flat index we have not used the strides as this is not neccessary. To explain the method let's look at an example with a four dimensional array where the $k$'th dimension has the size $d_k$. The flat index $i_flat$ for the array position \texttt{a[i1,i2,i3,i4]} is
 according to Section 3.2.3 calculated (with strides) like this:
-$$i_flat = i_1 s_1 + i_2 s_2 + i_3 s_3 + i_4 s_4$$
+$$i_{flat} = i_1 s_1 + i_2 s_2 + i_3 s_3 + i_4 s_4$$
 Using the recursive definition of the strides we get
-$$i_flat = 1*i_4 + d_4*i_3 + d_4 d_3 i_2 + d_4 d_3 d_2 i_1$$
-$$       = i_4 + d_4 (i_3 + d_3 (i_2 + (d_2 i_1))$$
+$$i_{flat} = 1*i_4 + d_4 i_3 + d_4 d_3 i_2 + d_4 d_3 d_2 i_1$$
+$$i_{flat} = i_4 + d_4 (i_3 + d_3 (i_2 + (d_2 i_1))$$
+It should be quite clear now that the flat index can be calculated recursively by alternately
+adding the next index $i_k$ and multiplying the result by $d_k+1$, i.e. if \texttt{t} is the
+variable holding the flat index:
+\begin{verbatim}
+flatIndex:=0;
+flatIndex:=t+i_1;
+flatIndex:=t*d_2;
+flatIndex:=t+i_2;
+flatIndex:=t*d_3;
+flatIndex:=t+i_3;
+flatIndex:=t*d_4;
+flatIndex:=t+i_4;
+\end{verbatim}
+\texttt{t} should now hold the flat index for \texttt{a[i1,i2,i3,i4]}.
+It should also be clear that we can derive a similar method for any number of dimensions. We
+will not this here, though. In \texttt{Compiler.sml} the flat index calculation is implemented
+in the function \texttt{calcFIndex}:
+\begin{lstlisting}
+fun calcFIndex ([exp], dim) =
+      let val index     = "_index"^newName()
+          val dimSize = "_sizeOfDim"^newName()
+          val compile_i = compileExp (vtab, exp, index)
+          val getDimSize = [Mips.LW (dimSize, metadata_p, Int.toString (4*(dim-1)))]
+      in  [Mips.ADDI (flatIndex, "0","0")] @ compile_i @ getDimSize
+        @ (checkIndex index dimSize)
+        @ [Mips.ADD (flatIndex, flatIndex, index)]
+      end
+  | calcFIndex (exp::exps, dim) =
+      let val code1 = calcFIndex (exps, dim-1)
+          val this_index = "_index"^newName()
+          val dimSize = "_sizeOfDim"^newName()
+          val compile_i = compileExp (vtab, exp, this_index)
 
+          val getDimSize = [Mips.LW (dimSize, metadata_p, Int.toString (4*(dim-1)))]
+          val code2 = [Mips.MUL (flatIndex, flatIndex, dimSize),
+                       Mips.ADD (flatIndex, flatIndex, this_index)]
+      in  code1
+        @ compile_i @ getDimSize @ (checkIndex this_index dimSize)
+        @ code2
+      end
+  | calcFIndex _ = raise Fail ("Should not be possible if LVal"^
+                               "typechecks correctly")
+
+\end{lstlisting}
+Note, that the list of expressions is assumed to be reversed before given to \texttt{calcFIndex}.
+For each index-expression. The expression is compiled and the size of the corresponding dimension
+is loaded from the metadata. The index check \texttt{checkIndex} is added. I.e. the index check is
+done as we go through the indices gradually calculating the flat index. (This way we only have to
+load each dimension size once.) It should also be noted that the first clause (taking care of the
+last index or the only index if the array is 1D) will always be reached and its MIPS-code will be
+placed in the beginning of the instruction list. Therefore, it does make sense to instantiate the
+variable \texttt{flatIndex} here. (Cf. \texttt{Mips.ADDI (flatIndex, "0", "0")}). The index checking
+is done in \texttt{checkIndex}:
+\begin{lstlisting}
+fun checkIndex index dimSize =
+              let val b1 = "_legalIndex"^newName()
+                  val b2 = "_tmp"^newName()
+              in
+               [ Mips.SLT (b1, index, dimSize),
+                 Mips.SLT (b2, index, "0"),
+                 Mips.BEQ (b1, "0", "_IllegalArrIndexError_"),
+                 Mips.BNE (b2, "0", "_IllegalArrIndexError_") ]
+              end
+\end{lstlisting}
+It simply checks if a given index (integer) is non-negative and less than the given dimension size.
+\newline
+The rest of the \texttt{compileLVal}-clause for array indexing is shown below:
+\begin{lstlisting}
+    | compileLVal( vtab : VTab, Index ((n, Array(rank, elem_type)),inds) : LVAL, pos : Pos ) =
+        (case SymTab.lookup n vtab of
+          NONE => raise Error ("unknown variable " ^ n, pos)
+        | SOME metadata_p =>
+        let val base = "_base"^newName()
+            val flatIndex = "_flatIndex"^newName()
+            val addr = "_addr"^newName()
+
+            (* Generate MIPS-code for checking if an array index is out of bounds *)
+            fun checkIndex index dimSize =
+              ...
+
+            fun calcFIndex ([exp], dim) =
+              ...
+
+            (* ints are 4 bytes each and bools and chars are just 1 each *)
+            val calcAddr = case elem_type of
+              Int => [Mips.LW  (base, metadata_p, Int.toString (4*(rank*2-1))),
+                      Mips.SLL (addr, flatIndex, "2"),
+                      Mips.ADD (addr, addr, base)]
+            | _   => [Mips.LW  (base, metadata_p, Int.toString (4*(rank *2-1))),
+                      Mips.ADD (addr, flatIndex, base)]
+            val fullcode = calcFIndex (rev inds, rank) @ calcAddr
+        in
+          (fullcode, Mem addr)
+        end)
+\end{lstlisting}
+As mentioned above the last steps of the address calculation is to get the base-address (here
+found by adding $4*(2n-1)$ ($n$ being the rank) to the metadata-pointer as there are $2n$
+integers (of 4 bytes each) stored in a row. One of two different pieces of MIPS-code is generated
+based on the type of elements in the array. If the array holds integer values we need to multiply
+the flat index by four, i.e. shift the bits 2 times two the left. Note, that the list \texttt{inds}
+of index-expressions is reversed as mentioned above. Lastly, the address is returned as a
+\texttt{Location}-value (\texttt{Mem addr}).
 \section{Call-by-value-result semantics for procedures}
 To implement call-by-value-result semantics, a slightly different procedure was necessary
 for the interpreter and the compiler. 
