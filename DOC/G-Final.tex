@@ -1,5 +1,6 @@
 \documentclass{article}
 
+\usepackage{amssymb, amsmath}
 \usepackage{listings}
 \usepackage{color}
 \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
@@ -268,12 +269,16 @@ The purpose of the machine code generated here is to calculate the address of a 
   \item Then we find the base of the array, which is the last element in the metadata of the array.
   \item Finally, we add the flat index (multiplied by the byte-size of the type of the array elements, e.g. 4 for an int-array) and the base together to get the final address.
 \end{enumerate}
-Calculating the flat index we have not used the strides as this is not neccessary. To explain the method let's look at an example with a four dimensional array where the $k$'th dimension has the size $d_k$. The flat index $i_flat$ for the array position \texttt{a[i_1,i_2,i_3,i_4]} is
+Calculating the flat index we have not used the strides as this is not neccessary. To explain the method let's look at an example with a four dimensional array where the $k$'th dimension has the size $d_k$. The flat index $i_{flat}$ for the array position \texttt{a\[i_1,i_2,i_3,i_4\]} is
 according to Section 3.2.3 calculated (with strides) like this:
-$$i_flat = i_1 s_1 + i_2 s_2 + i_3 s_3 + i_4 s_4$$
+\begin{equation*}
+i_{flat} = i_1 s_1 + i_2 s_2 + i_3 s_3 + i_4 s_4
+\end{equation*}
 Using the recursive definition of the strides we get
-$$i_flat = 1*i_4 + d_4*i_3 + d_4 d_3 i_2 + d_4 d_3 d_2 i_1$$
-$$       = i_4 + d_4 (i_3 + d_3 (i_2 + (d_2 i_1))$$
+\begin{align*}
+i_{flat} = & 1*i_4 + d_4*i_3 + d_4 d_3 i_2 + d_4 d_3 d_2 i_1 \\
+       =  & i_4 + d_4 (i_3 + d_3 (i_2 + (d_2 i_1))
+\end{align*}
 
 \section{Call-by-value-result semantics for procedures}
 To implement call-by-value-result semantics, a slightly different procedure was necessary
