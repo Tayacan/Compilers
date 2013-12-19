@@ -46,13 +46,27 @@
     showstringspaces=false,
     language=SML,
     frame=single,
-    basicstyle=\ttfamily\color{red!80!black},
+    basicstyle=\footnotesize\ttfamily\color{red!80!black},
       keywordstyle=\bfseries\color{blue},
       commentstyle=\color{green!40!black},
       identifierstyle=\ttfamily\color{black},
       stringstyle=\color{yellow!65!black},
 }
 
+\lstdefinestyle{appendix}{
+    breaklines     = true,
+    numbers        = left,
+    stepnumber     = 1,
+    numberstyle=\color{black},
+    showstringspaces=false,
+    %language=SML,
+    frame=single,
+    basicstyle=\tiny\ttfamily\color{red!80!black},
+      keywordstyle=\bfseries\color{blue},
+      commentstyle=\color{green!40!black},
+      identifierstyle=\ttfamily\color{black},
+      stringstyle=\color{yellow!65!black},
+}
 
 \title{Paladim - Final hand-in}
 \author{Ask Neve Gamby, Maya Saietz \& Christian Haase}
@@ -77,8 +91,6 @@ transformations of the grammar:
         the actual operator-terminals. This was done to unhide operator precedence for
         mosmlyac.
 \end{enumerate}
-
-The grammar for the new parser can be seen in appendix \ref{parser}.
 
 \subsection{Testing the parser}
 Most of the testing has been done using a small test-framework that we built. The framework
@@ -238,67 +250,6 @@ The code looks like this:
 
 In an ideal world, type-checking all arguments with integer as the expected type should be enough to ensure that they are all integers, but \texttt{typeCheckExp} only uses the expected type in cases where it's unclear what type an expression should have, such as \texttt{read}-calls. This means that \texttt{typeCheckExp(vtab, somePlusExpression, KnownType(BType Bool))} would not fail, even though a plus expression is always an integer type.
 
-\subsection{Testing \texttt{read} and \texttt{new}}
-We tested \texttt{read} by writing a Paladim program that uses it in various contexts where the type can be inferred:
-
-\begin{lstlisting}[language=Paladim]
-program inferenceRead;
-
-function f() : bool
-    return read();
-
-procedure main()
-var n : int;
-    c : char;
-    b : bool;
-begin
-    c := 'a';
-    n := 2 + read();
-
-    write("n = ");
-    write(n);
-    write("\n");
-
-    b := chr(read()) = read();
-
-    write("b = ");
-    write(b);
-    write("\n");
-
-    c := read();
-
-    write("c = ");
-    write(c);
-    write("\n");
-
-    b := f();
-
-    write("b = ");
-    write(b);
-    write("\n");
-end;
-\end{lstlisting}
-
-The above program runs as it should, both in the interpreter and when compiled and run in Mars. Changing line 18 to \texttt{b := read() = read();} results in a type error, as expected.
-
-For \texttt{new}, we wrote the following program:
-
-\begin{lstlisting}[language=Paladim]
-program testNew;
-
-procedure main()
-var a : array of int;
-    b : array of array of bool;
-    c : array of array of array of char;
-begin
-    a := new (5);
-    b := new (2, 3);
-    c := new (4, 3, 2);
-end;
-\end{lstlisting}
-
-This runs as it should in both the interpreter and compiler -- that is, it produces no output at all.
-
 \section{Array indexing}
 \subsection{Type checking}
 Type checking of an array index is simply done by mapping a function that type checks an expression and raises an error if it is not of type \texttt{int} on the list of the given indexes. It also checks that the indexing is full, i.e. the rank of the array equals the length of the list of indexes.
@@ -343,10 +294,6 @@ i_{flat} = & 1*i_4 + d_4*i_3 + d_4 d_3 i_2 + d_4 d_3 d_2 i_1 \\
        =  & i_4 + d_4 (i_3 + d_3 (i_2 + (d_2 i_1))
 \end{align*}
 
-\subsection{Tests of array indexing}
-
-For this, there were already plenty of programs that would reveal errors in the implementation, such as \texttt{fibArray.pal} and \texttt{gameoflife.pal}. In addition, we wrote a few tests specifically for this. %TODO put in appendix and refer to that (those are long programs).
-
 \section{Call-by-value-result semantics for procedures}
 To implement call-by-value-result semantics, a slightly different procedure was necessary
 for the interpreter and the compiler. 
@@ -381,24 +328,18 @@ Since this code needs to be put after the function call, then the constructer re
 return value (of the now triple turple), and that code is then appended to code for calling the procedure
 (meaning after the jump to the procedure).
 
-\subsection{Tests of procedures}
-
-The file \texttt{proctest.pal} already provided a nice test example, along with the files \texttt{procSwap.pal} and \texttt{procReturnSimul.pal}. These
-programs all work as expected, both in the interpreter and the compiler.
-
 \newpage
 \begin{appendix}
 \section{Source code}
 \subsection{Parser.grm}
-\label{parser}
-    \lstinputlisting[language=Yacc]{../SRC/Parser.grm}
-%\subsection{ParserTest.sml}
-%    \lstinputlisting[language=SML]{../SRC/ParserTest.sml}
-%\subsection{Compiler.sml}
-%    \lstinputlisting[language=SML]{../SRC/Compiler.sml}
-%\subsection{Type.sml}
-%    \lstinputlisting[language=SML]{../SRC/Type.sml}
-%\subsection{TpInterpret.sml}
-%    \lstinputlisting[language=SML]{../SRC/TpInterpret.sml}
+    \lstinputlisting[language=Yacc, style = appendix]{../SRC/Parser.grm}
+\subsection{ParserTest.sml}
+    \lstinputlisting[language=SML, style = appendix]{../SRC/ParserTest.sml}
+\subsection{Compiler.sml}
+    \lstinputlisting[language=SML, style = appendix]{../SRC/Compiler.sml}
+\subsection{Type.sml}
+    \lstinputlisting[language=SML, style = appendix]{../SRC/Type.sml}
+\subsection{TpInterpret.sml}
+    \lstinputlisting[language=SML, style = appendix]{../SRC/TpInterpret.sml}
 \end{appendix}
 \end{document}
