@@ -180,7 +180,15 @@ Type-checking of multiplication, division and \texttt{or} was done by using the 
 \end{lstlisting}
 
 \subsection{Testing the new operators}
-
+The boolean operators were mainly tested by running \texttt{logical.pal}, although additional
+test-programs was written. When run they all print the expected result and the actual result,
+so that it is easy to check if the program has been interpreted or compiled correctly.
+Multiplication and division was tested using \texttt{testMulDiv.pal}, although we also tested
+the behaviour for overflow and zero division (using the corresponding paladim-programs). As
+expected, division by zero results in a runtime error and overflow by multiplication just
+returns a wrong result, because the MIPS instruction doesn't have overflow detection. When
+interpreting \texttt{zerodivision.pal} and \texttt{mult\_overflow.pal} we get the corresponding
+MosML-exceptions, as expected.
 \section{Type-checking of \texttt{read} and \texttt{new}}
 %The idea is to use the ability to 'guess' the type of an expression by replacing \texttt{UnknownType} in calls to \texttt{typeCheckExp} with the acutal expected type whenever there is one. E.g. when checking an equality-expression we should use the checked type of the first expression as the expected type for the second, as the two should have the same type.
 
