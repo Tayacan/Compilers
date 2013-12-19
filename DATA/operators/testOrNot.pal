@@ -11,8 +11,10 @@ begin
    x2 := 6;
 
    // expecting 0 1, respectively
+   write("Test 1 expects 0 and was: ");
    write(not(x1<x2));
    write('\n');
+   write("Test 2 expects 1 and was: ");
    write(x2<x1 or x1<x2);
    write('\n');
 

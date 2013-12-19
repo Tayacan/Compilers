@@ -18,6 +18,7 @@ begin
    y := 3;
    z := 12;
 
+   write("Test result should be 1. Actual result: ");
    if (andTest(x) and not andTest(12) and orTest(z) and
        orTest(y-z) and notTest(2) and notTest(7)) then
      write("1");

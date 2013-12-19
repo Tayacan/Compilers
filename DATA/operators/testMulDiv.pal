@@ -10,10 +10,15 @@ begin
    x1 := 4 * 3;
    x2 := x1 * 5 * x1;
 
-   // expecting 12 and 720, respectively
+   // expecting 12, 720 and 60 respectively
+   write("Test 1 expects 12 and was: ");
    write(x1);
    write('\n');
+   write("Test 2 expects 720 and was: ");
    write(x2);
    write('\n');
+   write("Test 3 expects 60 and was: ");
+   write (x2/x1);
+   write ('\n');
 
 end; // main
