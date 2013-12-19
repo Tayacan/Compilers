@@ -1,0 +1,11 @@
+program testNew;
+
+procedure main()
+var a : array of int;
+    b : array of array of bool;
+    c : array of array of array of char;
+begin
+    a := new (5);
+    b := new (2,3);
+    c := new (4, 3, 2);
+end;
