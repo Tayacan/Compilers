@@ -251,7 +251,6 @@ struct
         end
 
     (* Task 2: Or and Not implemented: *)
-
     | compileExp( vtable, Or(e1, e2, pos), place ) =
         let val t1 = "or1_" ^ newName()
             val c1 = compileExp(vtable, e1, t1)
@@ -520,31 +519,8 @@ struct
         in
           (fullcode, Mem addr)
         end)
-    | compileLVal _ = raise Fail "impossible"
-        (*************************************************************)
-        (*** TODO: IMPLEMENT for G-ASSIGNMENT, TASK 4              ***)
-        (*** Sugested implementation STEPS:                        ***)
-        (***  1. Lookup the name of the array in order to get a    ***)
-        (***     pointer to the array metadata.                    ***)
-        (***  2. Create a function that generates code to check    ***)
-        (***     if a given index is out of bounds. If this is     ***)
-        (***     the case your code needs to jump to the           ***)
-        (***     label _IllegalArrIndexError_.                     ***)
-        (***  3. Compute the flat index using the stored strides.  ***)
-        (***     It might be easier to calculate the contribution  ***)
-        (***     from the last index seperately, as the            ***)
-        (***     corresponding stride is always 1 and              ***)
-        (***     isn't stored in the metadata.                     ***)
-        (***  4. Find the address of the element in memory by      ***)
-        (***     combining the flat index, the basic element type  ***)
-        (***     and the pointer to the array.                     ***)
-        (***  5. Concat all the generated code and return it       ***)
-        (***     with the register containing the final address    ***)
-        (***     of the element.                                   ***)
-        (***     Bonus question: can you implement it without      ***)
-        (***                        using the stored strides?      ***)
-        (*************************************************************)
 
+    | compileLVal _ = raise Fail "impossible"
 
   (* instr.s for one statement. exitLabel is end (for control flow jumps) *)
   and compileStmt( vtab, ProcCall (("write",_), [e], pos), _ ) =
