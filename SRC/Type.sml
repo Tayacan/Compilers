@@ -175,21 +175,6 @@ struct
           end
         | _ => raise Error("Type check error: can only index into arrays, at ", pos)
        )
-        (*************************************************************)
-        (*** TO DO: IMPLEMENT for G-ASSIGNMENT, TASK 4             ***)
-        (*** Suggested implementation STEPS:                       ***)
-        (***    1. check that the indexes, `inds', are int exps    ***)
-        (***       ( retorical question: what is the expected type ***)
-        (***         when calling typeOfExp on each index? )       ***)
-        (***    2. check that the type of `id' (the indexed array) ***)
-        (***       is an array type, `id_tp' (via vtab lookup)     ***)
-        (***       AND that the rank of `id_tp' equals the length  ***)
-        (***       of `inds', i.e., full indexing is expected,     ***)
-        (***       AND that the rank > 0                           ***)
-        (***    3. the result expression should be                 ***)
-        (***         LValue( Index ((id, id_tp), new_inds), pos )  ***)
-        (***       where `new_inds' are the typed version of `inds'***)
-        (*************************************************************)
 
       (* Must be modified to complete task 3 *)
     | typeCheckExp( vtab, AbSyn.Plus (e1, e2, pos), _ ) =

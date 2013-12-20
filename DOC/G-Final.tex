@@ -463,7 +463,16 @@ All the changes and additions to Compiler.sml.
     \lstinputlisting[language=SML, style = appendix,firstline=652,lastline=692]{../SRC/Compiler.sml}
 
 \subsection{Type.sml}
-    \lstinputlisting[language=SML, style = appendix]{../SRC/Type.sml}
+\subsubsection{Type-checking array indexes}
+    \lstinputlisting[language=SML, style = appendix,firstline=159,lastline=177]{../SRC/Type.sml}
+\subsubsection{Type inference for \texttt{read}}
+Most instances of \texttt{UnknownType} have been changed into \texttt{KnownType}s.
+    \lstinputlisting[language=SML, style = appendix,firstline=179,lastline=283]{../SRC/Type.sml}
+\subsubsection{Type-checking \texttt{new}}
+    \lstinputlisting[language=SML, style = appendix,firstline=316,lastline=333]{../SRC/Type.sml}
+\subsubsection{Type-checking \texttt{or}, \texttt{not}, \texttt{*} and \texttt{/}}
+    \lstinputlisting[language=SML, style = appendix,firstline=201,lastline=220]{../SRC/Type.sml}
+    \lstinputlisting[language=SML, style = appendix,firstline=265,lastline=283]{../SRC/Type.sml}
 
 \subsection{TpInterpret.sml}
     \lstinputlisting[language=SML, style = appendix]{../SRC/TpInterpret.sml}
