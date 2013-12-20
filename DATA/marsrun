@@ -1,0 +1,5 @@
+#!/bin/sh
+
+./Paladim $1.pal
+java -jar ./Mars4_4.jar $1.asm
+rm $1.asm
