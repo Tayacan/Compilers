@@ -695,7 +695,10 @@ struct
            * or a procedure. **)
           val body = compileStmts block vtable (fname ^ "_exit")
           val (body1, _, maxr, spilled) =  (* call register allocator *)
-              RegAlloc.registerAlloc ( argcode @ body @ mvargs )
+              RegAlloc.registerAlloc ( argcode
+                                     @ body
+                                     @ [Mips.LABEL (fname^"_exit")]
+                                     @ mvargs )
                                      ["2"] minReg maxCaller maxReg 0
                                      (* 2 contains return val*)
           val (savecode, restorecode, offset) = (* save/restore callee-saves *)
@@ -706,7 +709,6 @@ struct
              Mips.ADDI (SP,SP,makeConst (~4-offset))] (* move SP "up" *)
           @ savecode                 (* save callee-saves registers *)
           @ body1                    (* code for function body *)
-          @ [Mips.LABEL (fname^"_exit")] (* exit label *)
           @ restorecode              (* restore callee-saves registers *)
           @ [Mips.ADDI (SP,SP,makeConst (4+offset))] (* move SP "down" *)
           @ [Mips.LW (RA, SP, "-4"),  (* restore return addr *)
