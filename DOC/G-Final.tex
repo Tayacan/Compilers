@@ -442,6 +442,44 @@ return value (of the now triple turple), and that code is then appended to code 
 
 \newpage
 \begin{appendix}
+\section{Test framework}
+We wrote a small test framework in Python and \texttt{sh} for automatic testing. It only works on UNIX environments, and
+requires Python 2.x.
+
+The framework can be found in the \texttt{DATA} folder,
+and can be run with the command:
+
+\begin{verbatim}
+$ python test.py
+\end{verbatim}
+This will output the various tests, grouped by the feature they are testing (for example, there is a group called
+``if'' and one called ``arrays''). It is also possible to run select testgroups with the command:
+
+\begin{verbatim}
+$ python test.py <groups>
+\end{verbatim}
+For example, the following command runs all tests related to if-statements and arrays:
+
+\begin{verbatim}
+$ python test.py if arrays
+\end{verbatim}
+
+The following command print a list of all test groups:
+
+\begin{verbatim}
+$ python test.py -l
+\end{verbatim}
+
+The source code for the test framework can be found in the files \texttt{test.py} and \texttt{marsrun}.
+
+\subsection{test.py}
+Test framework for Paladim
+\lstinputlisting[language=python]{../DATA/test.py}
+\subsection{marsrun}
+\texttt{marsrun} simply compiles a .pal file, runs the resulting .asm file, and then deletes it. It takes one
+argument, which is the filename, but without the .pal extension.
+\lstinputlisting[language=sh]{../DATA/marsrun}
+
 \section{Source code}
 \subsection{Parser.grm}
     \lstinputlisting[language=Yacc, style = appendix]{../SRC/Parser.grm}

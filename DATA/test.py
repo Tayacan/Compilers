@@ -130,6 +130,10 @@ def main():
 
     if len(argv) == 1:
         allTests()
+    elif "-l" in argv:
+        print "Test groups:"
+        for n in tests.keys():
+            print n
     else:
         for t in argv[1:]:
             if t not in tests:
