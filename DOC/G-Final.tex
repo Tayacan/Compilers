@@ -68,6 +68,8 @@
       stringstyle=\color{yellow!65!black},
 }
 
+\newcommand{\Cfile}[4][SML]{ \lstinputlisting[language=#1, style = appendix,firstline=#3,lastline=#4, firstnumber=#3]{../SRC/#2}}
+
 \title{Paladim - Final hand-in}
 \author{Ask Neve Gamby, Maya Saietz \& Christian Haase}
 
@@ -492,27 +494,45 @@ argument, which is the filename, but without the .pal extension.
 All the changes and additions to Compiler.sml.
 
 \subsubsection{\texttt{or} and \texttt{not}}
-    \lstinputlisting[language=SML, style = appendix,firstline=253,lastline=270]{../SRC/Compiler.sml}
+
+\Cfile{Compiler.sml}{253}{270}
+%    \lstinputlisting[language=SML, style = appendix,firstline=253,lastline=270]{../SRC/Compiler.sml}
 \subsubsection{Indexes in arrays}
-    \lstinputlisting[language=SML, style = appendix,firstline=465,lastline=521]{../SRC/Compiler.sml}
+\Cfile{Compiler.sml}{465}{521}
+%    \lstinputlisting[language=SML, style = appendix,firstline=465,lastline=521]{../SRC/Compiler.sml}
 \subsubsection{Call-by-value-result semantics for procedures}
-    \lstinputlisting[language=SML, style = appendix,firstline=433,lastline=454]{../SRC/Compiler.sml}
-    \lstinputlisting[language=SML, style = appendix,firstline=574,lastline=582]{../SRC/Compiler.sml}
-    \lstinputlisting[language=SML, style = appendix,firstline=652,lastline=692]{../SRC/Compiler.sml}
+\Cfile{Compiler.sml}{433}{454}
+%    \lstinputlisting[language=SML, style = appendix,firstline=433,lastline=454]{../SRC/Compiler.sml}
+\Cfile{Compiler.sml}{574}{582}
+%    \lstinputlisting[language=SML, style = appendix,firstline=574,lastline=582]{../SRC/Compiler.sml}
+\Cfile{Compiler.sml}{652}{692}
+%    \lstinputlisting[language=SML, style = appendix,firstline=652,lastline=692]{../SRC/Compiler.sml}
 
 \subsection{Type.sml}
 \subsubsection{Type-checking array indexes}
-    \lstinputlisting[language=SML, style = appendix,firstline=159,lastline=177]{../SRC/Type.sml}
+\Cfile{Type.sml}{159}{177}
+%    \lstinputlisting[language=SML, style = appendix,firstline=159,lastline=177]{../SRC/Type.sml}
 \subsubsection{Type inference for \texttt{read}}
 Most instances of \texttt{UnknownType} have been changed into \texttt{KnownType}s.
-    \lstinputlisting[language=SML, style = appendix,firstline=179,lastline=283]{../SRC/Type.sml}
+\Cfile{Type.sml}{179}{283}
+%    \lstinputlisting[language=SML, style = appendix,firstline=179,lastline=283]{../SRC/Type.sml}
 \subsubsection{Type-checking \texttt{new}}
-    \lstinputlisting[language=SML, style = appendix,firstline=316,lastline=333]{../SRC/Type.sml}
+\Cfile{Type.sml}{316}{333}
+%    \lstinputlisting[language=SML, style = appendix,firstline=316,lastline=333]{../SRC/Type.sml}
 \subsubsection{Type-checking \texttt{or}, \texttt{not}, \texttt{*} and \texttt{/}}
-    \lstinputlisting[language=SML, style = appendix,firstline=201,lastline=220]{../SRC/Type.sml}
-    \lstinputlisting[language=SML, style = appendix,firstline=265,lastline=283]{../SRC/Type.sml}
+\Cfile{Type.sml}{201}{220}
+%    \lstinputlisting[language=SML, style = appendix,firstline=201,lastline=220]{../SRC/Type.sml}
+\Cfile{Type.sml}{265}{283}
+%    \lstinputlisting[language=SML, style = appendix,firstline=265,lastline=283]{../SRC/Type.sml}
 
 \subsection{TpInterpret.sml}
-    \lstinputlisting[language=SML, style = appendix]{../SRC/TpInterpret.sml}
+\Cfile{TpInterpret.sml}{121}{129}
+%    \lstinputlisting[language=SML, style = appendix,firstline=121,lastline=129]{../SRC/TpInterpret.sml}
+\Cfile{TpInterpret.sml}{494}{507}
+%    \lstinputlisting[language=SML, style = appendix,firstline=494,lastline=507]{../SRC/TpInterpret.sml}
+\Cfile{TpInterpret.sml}{527}{534}
+%    \lstinputlisting[language=SML, style = appendix,firstline=527,lastline=534]{../SRC/TpInterpret.sml}
+\Cfile{TpInterpret.sml}{163}{183}
+%    \lstinputlisting[language=SML, style = appendix,firstline=163,lastline=183]{../SRC/TpAbSyn.sml}
 \end{appendix}
 \end{document}
