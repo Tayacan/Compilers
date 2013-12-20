@@ -445,12 +445,26 @@ return value (of the now triple turple), and that code is then appended to code 
 \section{Source code}
 \subsection{Parser.grm}
     \lstinputlisting[language=Yacc, style = appendix]{../SRC/Parser.grm}
+
 \subsection{ParserTest.sml}
     \lstinputlisting[language=SML, style = appendix]{../SRC/ParserTest.sml}
+
 \subsection{Compiler.sml}
-    \lstinputlisting[language=SML, style = appendix]{../SRC/Compiler.sml}
+
+All the changes and additions to Compiler.sml.
+
+\subsubsection{\texttt{or} and \texttt{not}}
+    \lstinputlisting[language=SML, style = appendix,firstline=253,lastline=270]{../SRC/Compiler.sml}
+\subsubsection{Indexes in arrays}
+    \lstinputlisting[language=SML, style = appendix,firstline=465,lastline=521]{../SRC/Compiler.sml}
+\subsubsection{Call-by-value-result semantics for procedures}
+    \lstinputlisting[language=SML, style = appendix,firstline=433,lastline=454]{../SRC/Compiler.sml}
+    \lstinputlisting[language=SML, style = appendix,firstline=574,lastline=582]{../SRC/Compiler.sml}
+    \lstinputlisting[language=SML, style = appendix,firstline=652,lastline=692]{../SRC/Compiler.sml}
+
 \subsection{Type.sml}
     \lstinputlisting[language=SML, style = appendix]{../SRC/Type.sml}
+
 \subsection{TpInterpret.sml}
     \lstinputlisting[language=SML, style = appendix]{../SRC/TpInterpret.sml}
 \end{appendix}
