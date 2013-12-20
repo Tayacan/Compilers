@@ -116,6 +116,8 @@ $ make
 $ mosml ParserTest.sml
 \end{verbatim}
 
+The source code for the test framework can be seen in appendix \ref{parsertest}.
+
 A nicer and easier way of testing would be to use the old LL1Parser as a reference. There are
 a few problems with this, though. First, it would require that we kept an additional lexer
 which used the old token type. Second, the LL1Parser can't parse everything in the Paladim
@@ -207,6 +209,8 @@ expected, division by zero results in a runtime error and overflow by multiplica
 returns a wrong result, because the MIPS instruction doesn't have overflow detection. When
 interpreting \texttt{zerodivision.pal} and \texttt{mult\_overflow.pal} we get the corresponding
 MosML-exceptions, as expected.
+
+Some of these tests can also be run using the test framework described in appendix \ref{test}.
 \section{Type-checking of \texttt{read} and \texttt{new}}
 %The idea is to use the ability to 'guess' the type of an expression by replacing \texttt{UnknownType} in calls to \texttt{typeCheckExp} with the acutal expected type whenever there is one. E.g. when checking an equality-expression we should use the checked type of the first expression as the expected type for the second, as the two should have the same type.
 
@@ -275,6 +279,9 @@ The code looks like this:
 \end{lstlisting}
 
 In an ideal world, type-checking all arguments with integer as the expected type should be enough to ensure that they are all integers, but \texttt{typeCheckExp} only uses the expected type in cases where it's unclear what type an expression should have, such as \texttt{read}-calls. This means that \texttt{typeCheckExp(vtab, somePlusExpression, KnownType(BType Bool))} would not fail, even though a plus expression is always an integer type.
+
+\subsection{Testing the type-checking}
+\texttt{read} and \texttt{new} were tested using the test-framework described in appendix \ref{test} (test groups ``arrays'' and ``read'').
 
 \section{Array indexing}
 \subsection{Type checking}
@@ -424,6 +431,8 @@ of index-expressions is reversed as mentioned above. Lastly, the address is retu
 \subsection{Tests of array indexing}
 For this, there were already plenty of programs that would reveal errors in the implementation, such as \texttt{fibArray.pal} and \texttt{gameoflife.pal}. In addition, we wrote a few tests specifically for this. %TODO put in appendix and refer to that (those are long programs).
 
+Additionally, we have a few tests in the test-framework described in appendix \ref{test}.
+
 \section{Call-by-value-result semantics for procedures}
 To implement call-by-value-result semantics, a slightly different procedure was necessary
 for the interpreter and the compiler. 
@@ -458,9 +467,13 @@ Since this code needs to be put after the function call, then the constructer re
 return value (of the now triple turple), and that code is then appended to code for calling the procedure
 (meaning after the jump to the procedure).
 
+\subsection{Testing call-by-value-result semantics}
+This was tested using the test-framework described in appendix \ref{test}.
+
 \newpage
 \begin{appendix}
 \section{Test framework}
+\label{test}
 We wrote a small test framework in Python and \texttt{sh} for automatic testing. It only works on UNIX environments, and
 requires Python 2.x.
 
@@ -491,7 +504,8 @@ $ python test.py -l
 The source code for the test framework can be found in the files \texttt{test.py} and \texttt{marsrun}.
 
 \subsection{test.py}
-Test framework for Paladim
+Test framework for Paladim. Each program is tried in both the interpreter and the compiler. The expected output
+is hard-coded in each test, as is the input for programs that call the \texttt{read} functions.
 \lstinputlisting[language=python]{../DATA/test.py}
 \subsection{marsrun}
 \texttt{marsrun} simply compiles a .pal file, runs the resulting .asm file, and then deletes it. It takes one
@@ -503,6 +517,7 @@ argument, which is the filename, but without the .pal extension.
     \lstinputlisting[language=Yacc, style = appendix]{../SRC/Parser.grm}
 
 \subsection{ParserTest.sml}
+\label{parsertest}
     \lstinputlisting[language=SML, style = appendix]{../SRC/ParserTest.sml}
 
 \subsection{Compiler.sml}
