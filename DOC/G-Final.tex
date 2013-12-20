@@ -147,8 +147,24 @@ Multiplication and division for integers and the missing boolean operators has b
         in c1 @ c2 @ [Mips.MUL (place, t1, t2)]
         end
 \end{lstlisting}
-The boolean operator \texttt{or} was implemented similarly to \texttt{and}. The only difference in \texttt{Compiler.sml} is that we only have to check the second expression if the first expression is false, whereas for \texttt{and} we only check the second expression if the first is true. This was simply done by branching (and thus skipping the second evaluation), when the first is equal to 1 instead of 0.\newline
-\texttt{not} was implemented in \texttt{Compile.sml} by simply XOR'ing the boolean value with 1, as \texttt{not x = x XOR 1}:
+The boolean operator \texttt{or} was implemented similarly to \texttt{and}. The only difference in \texttt{Compiler.sml} is that we only have to evaluate the second expression if the first expression
+evaluates to false, whereas for \texttt{and} we only evaluate the second expression if the first
+evaluates to true. This was simply done by branching (and thus skipping the second evaluation),
+when the first evaluates to 1 (i.e. $\neq 0$) instead of 0:
+\begin{lstlisting}
+    | compileExp( vtable, Or(e1, e2, pos), place ) =
+        let val t1 = "or1_" ^ newName()
+            val c1 = compileExp(vtable, e1, t1)
+            val t2 = "or2_" ^ newName()
+            val c2 = compileExp(vtable, e2, t2)
+            val lO = "_or_" ^ newName()
+        in c1 (* do first part, skip 2nd part if already true *)
+           @ [Mips.MOVE (place,t1), Mips.BNE (place, "0", lO) ]
+           @ c2 (* when here, t1 was  false, so the result is t2 *)
+           @ [Mips.MOVE (place,t2), Mips.LABEL lO ]
+        end
+\end{lstlisting}
+\texttt{not} was implemented in \texttt{Compiler.sml} by simply XOR'ing the boolean value with 1, as \texttt{not x = x XOR 1}:
 \begin{lstlisting}
     | compileExp( vtable, Not(e1, pos), place ) =
         let val t1 = "not_" ^ newName()
