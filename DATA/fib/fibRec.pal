@@ -11,9 +11,6 @@ var
 begin
    n := read();
 
-   write(n);
-   write('\n');
-   
    write(fib(n));
    write('\n');
    

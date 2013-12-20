@@ -54,12 +54,13 @@ def procTest():
     runTests(tests,"functions/")
 
 def arrayTest():
-    tests = {"fooArray"        : ("","2\n")
-            ,"new"             : ("","")
-            ,"testIndexSimple" : ("","1234\n")
+    tests = {"arrays/fooArray"        : ("","2\n")
+            ,"arrays/new"             : ("","")
+            ,"arrays/testIndexSimple" : ("","1234\n")
+            ,"fib/fibArray"           : ("5\n","8\n")
             }
 
-    runTests(tests,"arrays/")
+    runTests(tests,"")
 
 def ifTest():
     ifRes = """test 1 expects result -1: ~1
@@ -101,12 +102,24 @@ passed.
 
     runTests(tests,"")
 
+def fibTest():
+    tests = {"fibRec_7"   : ("7\n","21\n")
+            ,"fibWhile_7" : ("7\n","21\n")
+            ,"fibArray_7" : ("7\n","21\n")
+            ,"fibRec_9"   : ("9\n","55\n")
+            ,"fibWhile_9" : ("9\n","55\n")
+            ,"fibArray_9" : ("9\n","55\n")
+            }
+
+    runTests(tests,"fib/")
+
 def main():
     tests = {"arrays"     : arrayTest
             ,"procedures" : procTest
             ,"read"       : readTest
             ,"if"         : ifTest
             ,"operators"  : opTest
+            ,"fib"        : fibTest
             }
 
     def allTests():
